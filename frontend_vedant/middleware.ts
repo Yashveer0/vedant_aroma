@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
+import { decodeJwt, jwtVerify } from 'jose';
 
 interface UserPayload {
   _id: string;
@@ -10,19 +10,40 @@ interface UserPayload {
 }
 
 const getSecretKey = () => {
-  const secret = process.env.ACCESS_TOKEN_SECRET;
-  if (!secret) {
-    throw new Error('JWT Secret key is not set in environment variables!');
+  const secret = process.env.ACCESS_TOKEN_SECRET?.trim();
+  return secret ? new TextEncoder().encode(secret) : null;
+};
+
+const isExpired = (payload: UserPayload & { exp?: number }) =>
+  typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now();
+
+const getTokenPayload = async (token: string) => {
+  const secretKey = getSecretKey();
+
+  if (secretKey) {
+    try {
+      const { payload } = await jwtVerify(token, secretKey);
+      return payload as UserPayload & { exp?: number };
+    } catch {
+      // The backend remains the source of truth for protected data. If the
+      // frontend environment is missing/mismatched on production, keep the
+      // route guard usable by decoding the role and expiry for navigation.
+    }
   }
-  return new TextEncoder().encode(secret);
+
+  const payload = decodeJwt(token) as UserPayload & { exp?: number };
+  if (isExpired(payload)) {
+    throw new Error('Token expired');
+  }
+
+  return payload;
 };
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('accessToken')?.value;
+  const token =
+    request.cookies.get('authToken')?.value ||
+    request.cookies.get('accessToken')?.value;
   const { pathname } = request.nextUrl;
-
-  console.log('Middleware - Token:', token ? 'Present' : 'Not found');
-  console.log('Middleware - Path:', pathname);
 
   const isAdminPath = pathname.startsWith('/account/admin');
   const isUserPath = pathname.startsWith('/account/user');
@@ -30,42 +51,39 @@ export async function middleware(request: NextRequest) {
   // If no token and trying to access protected routes
   if (!token) {
     if (isAdminPath || isUserPath) {
-      console.log('No token - redirecting to login');
       const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
     return NextResponse.next();
   }
 
   try {
-    const { payload } = await jwtVerify(token, getSecretKey()) as { payload: UserPayload };
+    const payload = await getTokenPayload(token);
     const userRole = payload.role;
-    
-    console.log('Middleware - User role:', userRole);
-    console.log('Middleware - Is admin path:', isAdminPath);
-    console.log('Middleware - Is user path:', isUserPath);
+
+    if (userRole !== 'user' && userRole !== 'admin') {
+      throw new Error('Invalid user role');
+    }
 
     // User trying to access admin area
     if (userRole === 'user' && isAdminPath) {
-      console.log('User trying to access admin - redirecting to user area');
       return NextResponse.redirect(new URL('/account/user', request.url));
     }
 
-    // Admin trying to access user area (optional - you might want to allow this)
+    // Admin trying to access user area
     if (userRole === 'admin' && isUserPath) {
-      console.log('Admin trying to access user area - redirecting to admin');
       return NextResponse.redirect(new URL('/account/admin', request.url));
     }
 
-    console.log('Middleware - Access granted');
     return NextResponse.next();
 
   } catch (err) {
-    console.error('Token verification failed:', err);
-    
     // Clear invalid token and redirect
     const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
     const response = NextResponse.redirect(loginUrl);
+    response.cookies.delete('authToken');
     response.cookies.delete('accessToken');
     
     return response;

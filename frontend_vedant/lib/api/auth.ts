@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import type { AppStore, RootState } from '@/lib/redux/store';
 import { logout } from '@/lib/redux/slices/authSlice';
 import { API_BASE_URL } from '@/lib/api/config';
+import { clearClientAuthCookies } from '@/lib/auth/sessionCookie';
 
 export interface Address {
   _id: string;
@@ -99,6 +100,7 @@ export const setupInterceptors = (store: AppStore) => {
         
         // Store ko parameter se use karke action dispatch kar rahe hain.
         // Using the store from the parameter to dispatch an action.
+        clearClientAuthCookies();
         store.dispatch(logout());
       }
       return Promise.reject(error);

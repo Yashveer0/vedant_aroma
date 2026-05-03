@@ -14,6 +14,7 @@ import { loginUserApi } from '@/lib/api/auth';
 import { loginSuccess } from '@/lib/redux/slices/authSlice';
 import { mergeCarts, fetchCart } from '@/lib/redux/slices/cartSlice';
 import { AppDispatch } from '@/lib/redux/store';
+import { setClientAuthCookie } from '@/lib/auth/sessionCookie';
 
 import { useCart } from "@/context/CartContext";
 import { useWishlist as useLocalWishlist } from "@/context/WishlistContext";
@@ -49,8 +50,8 @@ export default function LoginPage() {
       // First dispatch login success
       dispatch(loginSuccess({ user, accessToken }));
       
-      // Set cookie for middleware (important for live server)
-      document.cookie = `accessToken=${accessToken}; path=/; secure; SameSite=strict; max-age=${7 * 24 * 60 * 60}`;
+      // Set a same-site client cookie for Next middleware route protection.
+      setClientAuthCookie(accessToken);
       
       toast.success('Logged in successfully');
       
@@ -85,13 +86,17 @@ export default function LoginPage() {
       
       // Add a small delay to ensure cookie is set
       setTimeout(() => {
+        const redirectPath = new URLSearchParams(window.location.search).get('redirect');
         if (user.role === 'admin') {
           console.log("---------Redirecting to admin dashboard---------");
           // Use window.location for more reliable redirect on live server
-          window.location.href = '/account/admin';
+          window.location.href = redirectPath?.startsWith('/account/admin') ? redirectPath : '/account/admin';
         } else {
           console.log("---------Redirecting to home---------");
-          window.location.href = '/';
+          window.location.href =
+            redirectPath && !redirectPath.startsWith('/account/admin')
+              ? redirectPath
+              : '/';
         }
       }, 500);
 

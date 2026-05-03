@@ -6,7 +6,8 @@ import {
     updateCoupon,
     deleteCoupon
 } from "../controllers/coupon.controller.js";
-// import { verifyJWT } from "../middlewares/auth.middleware.js"; // Assuming you have this middleware
+import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { adminMiddleware } from "../middlewares/admin.middleware.js";
 
 const router = Router();
 
@@ -16,13 +17,13 @@ const router = Router();
 
 // --- Routes for creating and fetching all coupons ---
 router.route("/")
-    .post(createCoupon)
-    .get(getAllCoupons);
+    .post(authMiddleware, adminMiddleware, createCoupon)
+    .get(authMiddleware, adminMiddleware, getAllCoupons);
 
 // --- Routes for updating and deleting a specific coupon ---
 router.route("/:couponId")
-    .patch(updateCoupon) // PATCH is suitable for partial updates
-    .delete(deleteCoupon);
+    .patch(authMiddleware, adminMiddleware, updateCoupon) // PATCH is suitable for partial updates
+    .delete(authMiddleware, adminMiddleware, deleteCoupon);
 
 router.route('/code/:code').get(getCouponByCode);
 

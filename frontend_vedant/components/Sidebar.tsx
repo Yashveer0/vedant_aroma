@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { logoutUserApi } from "@/lib/api/auth";
 import { logout } from "@/lib/redux/slices/authSlice";
+import { clearClientAuthCookies } from "@/lib/auth/sessionCookie";
 import { useDispatch } from "react-redux";
 
 const navLinks = [
@@ -67,6 +68,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     } catch (error) {
       console.error("Failed to logout from server, but proceeding with client-side cleanup.");
     } finally {
+      clearClientAuthCookies();
       dispatch(logout()); // 2. Clear Redux state and localStorage
       router.push('/'); // 3. Redirect to the login page
     }

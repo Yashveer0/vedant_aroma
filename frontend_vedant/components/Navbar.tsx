@@ -32,6 +32,8 @@ import { selectIsAuthenticated, selectCurrentUser, logout } from '@/lib/redux/sl
 import { fetchSearchResults, clearSearchResults } from '@/lib/redux/slices/productSlice';
 import { fetchCart } from '@/lib/redux/slices/cartSlice';
 import { fetchWishlist, selectTotalWishlistItems } from '@/lib/redux/slices/wishlistSlice';
+import { clearClientAuthCookies } from '@/lib/auth/sessionCookie';
+import { logoutUserApi } from '@/lib/api/auth';
 
 // --- CONTEXT ---
 import { useCart as useLocalCart } from '@/context/CartContext';
@@ -85,10 +87,17 @@ const Navbar = () => {
         }
     }, [debouncedSearchQuery, dispatch]);
 
-    const handleLogout = () => {
-        dispatch(logout());
-        toast.success("You have been successfully logged out.");
-        router.push('/');
+    const handleLogout = async () => {
+        try {
+            await logoutUserApi();
+        } catch {
+            // Continue with local cleanup even if the server session is already gone.
+        } finally {
+            clearClientAuthCookies();
+            dispatch(logout());
+            toast.success("You have been successfully logged out.");
+            router.push('/');
+        }
     };
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -138,12 +147,20 @@ const Navbar = () => {
                             <p className="text-xs font-normal text-gray-500 truncate">{currentUser.email}</p>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href="/account/user">My Profile</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/account/user/order-history">My Orders</Link>
-                        </DropdownMenuItem>
+                        {currentUser.role === 'admin' ? (
+                            <DropdownMenuItem asChild>
+                                <Link href="/account/admin">Admin Dashboard</Link>
+                            </DropdownMenuItem>
+                        ) : (
+                            <>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/account/user">My Profile</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/account/user/order-history">My Orders</Link>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700">
                             Logout

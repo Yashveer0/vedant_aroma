@@ -9,6 +9,7 @@ import { verifyOtpApi } from '@/lib/api/auth'; // Ensure this path is correct
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { setClientAuthCookie } from '@/lib/auth/sessionCookie';
 
 export default function VerifyOtpForm() {
   const [otp, setOtp] = useState('');
@@ -39,6 +40,7 @@ export default function VerifyOtpForm() {
       
       // Dispatch user data to Redux store
       dispatch(loginSuccess({ user, accessToken }));
+      setClientAuthCookie(accessToken);
 
       // **NEW: Redirect based on user role**
       if (user.role === 'admin') {

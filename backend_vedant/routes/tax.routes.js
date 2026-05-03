@@ -10,6 +10,6 @@ const router = Router();
 
 router.route("/config")
     .get(getTaxConfig)
-    .put(setTaxConfig);
+    .put(authMiddleware, adminMiddleware, setTaxConfig);
 
 export default router;

@@ -25,7 +25,7 @@ import { getProductById } from "../controllers/user.controller.js";
 
 
 const router = Router();
-// router.use(authMiddleware, adminMiddleware);
+router.use(authMiddleware, adminMiddleware);
 
 router.route("/dashboard").get(getAdminDashboardStats);
 router.route("/sales-overview").get(getSalesOverview);

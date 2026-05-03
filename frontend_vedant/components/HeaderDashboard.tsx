@@ -7,6 +7,7 @@ import { logout } from '@/lib/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 
 import { logoutUserApi } from '@/lib/api/auth';
+import { clearClientAuthCookies } from '@/lib/auth/sessionCookie';
 
 import { useDispatch,useSelector } from "react-redux";
 
@@ -20,6 +21,7 @@ export default function HeaderDashboard({ title, onMenuClick }: { title: string;
     } catch (error) {
       console.error("Failed to logout from server, but proceeding with client-side cleanup.");
     } finally {
+      clearClientAuthCookies();
       dispatch(logout()); // 2. Clear Redux state and localStorage
       router.push('/'); // 3. Redirect to the login page
     }
