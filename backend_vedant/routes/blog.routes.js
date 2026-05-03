@@ -17,7 +17,6 @@ const router = Router();
 router.route("/").get(getAllPublishedBlogs);
 
 router.route("/all").get(getAllBlogs);
-router.route("/:slug").get(getBlogBySlug);
 
 router.route("/create").post(
     authMiddleware,
@@ -32,5 +31,7 @@ router.route("/update/:blogId").patch(authMiddleware,
     updateBlogPost);
 router.route("/delete/:blogId").delete(authMiddleware,
     adminMiddleware,deleteBlogPost);
+
+router.route("/:slug").get(getBlogBySlug);
 
 export default router;
