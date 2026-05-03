@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 // IMPORTANT: Hum yahan se sirf 'TYPES' import kar rahe hain, store ki actual file nahi.
 import type { AppStore, RootState } from '@/lib/redux/store';
 import { logout } from '@/lib/redux/slices/authSlice';
+import { API_BASE_URL } from '@/lib/api/config';
 
 export interface Address {
   _id: string;
@@ -47,7 +48,7 @@ interface BackendResponse<T> {
 // =================================================================
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1` : 'http://localhost:8000/api/v1',
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 

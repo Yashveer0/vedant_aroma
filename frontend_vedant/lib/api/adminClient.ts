@@ -2,9 +2,10 @@
 
 import axios from 'axios';
 import type { RootState, AppStore } from '@/lib/redux/store'; // Keep type imports, they don't cause cycles
+import { API_BASE_URL } from '@/lib/api/config';
 
 const adminApiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1` : 'http://localhost:8000/api/v1',
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 

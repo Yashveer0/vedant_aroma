@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_BASE_URL } from '@/lib/api/config';
 
 
 interface ProductStub {
@@ -56,10 +57,6 @@ const initialState: BulkOrderState = {
     status: 'idle',
     error: null,
 };
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
-  ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1`
-  : 'http://localhost:8000/api/v1';
 
 // =================================================================
 // --- ASYNC THUNKS ---

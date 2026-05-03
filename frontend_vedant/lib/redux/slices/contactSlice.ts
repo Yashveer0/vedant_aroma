@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { getAllInquiriesApi, updateInquiryApi, deleteInquiryApi } from '@/lib/api/admin';
+import { API_BASE_URL } from '@/lib/api/config';
 
 // Interface definitions remain the same...
 interface ContactInquiry {
@@ -27,8 +28,6 @@ const initialState: ContactState = {
     error: null,
 };
 
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 // Updated data type to include captchaToken
 interface SubmitInquiryData {

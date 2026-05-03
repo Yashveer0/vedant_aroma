@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({
   path: path.resolve(__dirname, "./.env"),
+  override: true,
 });
 
 const [{ default: connectDB }, { app }] = await Promise.all([

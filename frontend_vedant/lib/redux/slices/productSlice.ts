@@ -3,10 +3,7 @@ import axios from 'axios';
 import { Product, Review } from '@/lib/types/product';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api/auth';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
-  ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1`
-  : 'http://localhost:8000/api/v1';
+import { API_BASE_URL } from '@/lib/api/config';
 
 // --- Type Definitions ---
 

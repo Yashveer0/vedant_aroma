@@ -2,10 +2,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api/auth'; 
+import { BLOGS_API_BASE_URL } from '@/lib/api/config';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
-  ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/blogs`
-  : 'http://localhost:8000/api/v1/blogs';
+const API_BASE_URL = BLOGS_API_BASE_URL;
 
 
 export interface Blog {

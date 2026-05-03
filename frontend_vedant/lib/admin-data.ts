@@ -2,13 +2,14 @@
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
 import { Product } from '@/lib/data'; // Your frontend Product type definition
+import { API_BASE_URL } from '@/lib/api/config';
 
 // Set the base URL for your API. Store this in a .env file for production.
-const API_BASE_URL =  `${process.env.NEXT_PUBLIC_API_URL}/api/v1` || 'http://localhost:8000/api/v1';
+const ADMIN_API_BASE_URL = API_BASE_URL;
 
 // Create an Axios instance for API calls
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: ADMIN_API_BASE_URL,
 });
 
 // Helper to set the authorization header
@@ -269,4 +270,3 @@ export const deleteCouponApi = (couponId: string) => {
 // ): Promise<void> => {
 //   await apiClient.delete(`/notifications/${notificationId}`, getAuthHeaders(token));
 // };
-
