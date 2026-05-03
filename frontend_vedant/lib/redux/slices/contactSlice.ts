@@ -29,20 +29,20 @@ const initialState: ContactState = {
 };
 
 
-// Updated data type to include captchaToken
+// reCAPTCHA disabled.
 interface SubmitInquiryData {
     fullName: string;
     email: string;
     message: string;
     phoneNumber?: string;
-    captchaToken: string;
+    // captchaToken: string;
 }
 
 export const submitContactForm = createAsyncThunk(
     'contact/submit',
     async (inquiryData: SubmitInquiryData, { rejectWithValue }) => {
         try {
-            // The inquiryData now includes the captchaToken, which is sent to the backend
+            // reCAPTCHA disabled, so no captcha token is sent to the backend.
             const response = await axios.post(`${API_BASE_URL}/contact`, inquiryData);
             return response.data.message;
         } catch (error: any) {

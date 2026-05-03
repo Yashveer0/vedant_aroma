@@ -3,49 +3,52 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Contact } from "../models/contact.model.js";
 import mongoose from "mongoose";
-import axios from "axios";
+// reCAPTCHA disabled.
+// import axios from "axios";
 
-const isDevelopment = process.env.NODE_ENV !== "production";
-const configuredSecretKey = process.env.RECAPTCHA_SECRET_KEY?.trim();
-const recaptchaSecretKey =
-    configuredSecretKey && configuredSecretKey !== "your_recaptcha_secret"
-        ? configuredSecretKey
-        : null;
+// reCAPTCHA disabled.
+// const isDevelopment = process.env.NODE_ENV !== "production";
+// const configuredSecretKey = process.env.RECAPTCHA_SECRET_KEY?.trim();
+// const recaptchaSecretKey =
+//     configuredSecretKey && configuredSecretKey !== "your_recaptcha_secret"
+//         ? configuredSecretKey
+//         : null;
 
 const submitInquiry = asyncHandler(async (req, res) => {
-    // Destructure captchaToken from the request body
-    const { fullName, email, phoneNumber, message, captchaToken } = req.body;
+    // reCAPTCHA disabled.
+    // const { captchaToken } = req.body;
+    const { fullName, email, phoneNumber, message } = req.body;
 
-    // --- reCAPTCHA VERIFICATION ---
-    if (!isDevelopment && !captchaToken) {
-        throw new ApiError(400, "CAPTCHA verification failed. Please try again.");
-    }
-
-    if (!isDevelopment) {
-        try {
-            if (!recaptchaSecretKey) {
-                throw new ApiError(500, "reCAPTCHA secret key is not configured.");
-            }
-
-            const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${captchaToken}`;
-
-            const response = await axios.post(verificationURL);
-            const { success } = response.data;
-
-            if (!success) {
-                throw new ApiError(400, "Invalid CAPTCHA. Are you a robot?");
-            }
-        } catch (error) {
-            console.error("reCAPTCHA verification error:", error);
-            if (error instanceof ApiError) {
-                throw error;
-            }
-
-            // Throw a generic error to the user, but log the specific one
-            throw new ApiError(500, "Failed to verify CAPTCHA. Please try again later.");
-        }
-    }
-    // --- END reCAPTCHA VERIFICATION ---
+    // --- reCAPTCHA VERIFICATION DISABLED ---
+    // if (!isDevelopment && !captchaToken) {
+    //     throw new ApiError(400, "CAPTCHA verification failed. Please try again.");
+    // }
+    //
+    // if (!isDevelopment) {
+    //     try {
+    //         if (!recaptchaSecretKey) {
+    //             throw new ApiError(500, "reCAPTCHA secret key is not configured.");
+    //         }
+    //
+    //         const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${captchaToken}`;
+    //
+    //         const response = await axios.post(verificationURL);
+    //         const { success } = response.data;
+    //
+    //         if (!success) {
+    //             throw new ApiError(400, "Invalid CAPTCHA. Are you a robot?");
+    //         }
+    //     } catch (error) {
+    //         console.error("reCAPTCHA verification error:", error);
+    //         if (error instanceof ApiError) {
+    //             throw error;
+    //         }
+    //
+    //         // Throw a generic error to the user, but log the specific one
+    //         throw new ApiError(500, "Failed to verify CAPTCHA. Please try again later.");
+    //     }
+    // }
+    // --- END reCAPTCHA VERIFICATION DISABLED ---
 
     // Proceed with form data validation and saving
     if ([fullName, email, message].some((field) => !field || field.trim() === "")) {

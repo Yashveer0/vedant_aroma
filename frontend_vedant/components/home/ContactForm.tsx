@@ -1,20 +1,22 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Phone, MapPin, Mail, Loader2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/lib/redux/store'; // Ensure this path is correct for your store type
 import { submitContactForm } from '@/lib/redux/slices/contactSlice'; // Ensure this path is correct for your slice
-import ReCAPTCHA from 'react-google-recaptcha';
-import { toast } from 'sonner';
+// reCAPTCHA disabled.
+// import ReCAPTCHA from 'react-google-recaptcha';
+// import { toast } from 'sonner';
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
-const configuredSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim();
-const hasConfiguredSiteKey =
-    configuredSiteKey && configuredSiteKey !== 'your_recaptcha_site_key';
-const recaptchaSiteKey = hasConfiguredSiteKey ? configuredSiteKey : null;
+// reCAPTCHA disabled.
+// const isDevelopment = process.env.NODE_ENV !== 'production';
+// const configuredSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim();
+// const hasConfiguredSiteKey =
+//     configuredSiteKey && configuredSiteKey !== 'your_recaptcha_site_key';
+// const recaptchaSiteKey = hasConfiguredSiteKey ? configuredSiteKey : null;
 
 export function ContactForm() {
     // --- STATE MANAGEMENT ---
@@ -22,9 +24,10 @@ export function ContactForm() {
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [message, setMessage] = useState('');
-    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    // reCAPTCHA disabled.
+    // const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
+    // const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -32,16 +35,17 @@ export function ContactForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!isDevelopment && !recaptchaSiteKey) {
-            toast.error("reCAPTCHA is not configured yet. Please add a valid site key.");
-            return;
-        }
-
-        // Check if CAPTCHA is completed
-        if (!isDevelopment && !captchaToken) {
-            toast.error("Please complete the CAPTCHA before submitting.");
-            return;
-        }
+        // reCAPTCHA disabled.
+        // if (!isDevelopment && !recaptchaSiteKey) {
+        //     toast.error("reCAPTCHA is not configured yet. Please add a valid site key.");
+        //     return;
+        // }
+        //
+        // // Check if CAPTCHA is completed
+        // if (!isDevelopment && !captchaToken) {
+        //     toast.error("Please complete the CAPTCHA before submitting.");
+        //     return;
+        // }
 
         setIsSubmitting(true);
 
@@ -50,7 +54,7 @@ export function ContactForm() {
             email,
             message,
             phoneNumber,
-            captchaToken: captchaToken ?? '', // Include the captcha token
+            // captchaToken: captchaToken ?? '', // reCAPTCHA disabled
         };
 
         try {
@@ -61,8 +65,8 @@ export function ContactForm() {
             setEmail('');
             setPhoneNumber('');
             setMessage('');
-            setCaptchaToken(null);
-            recaptchaRef.current?.reset(); // Reset the reCAPTCHA widget
+            // setCaptchaToken(null);
+            // recaptchaRef.current?.reset(); // reCAPTCHA disabled
         } catch (error) {
             // Error toast is already handled by the slice
             console.error("Failed to submit inquiry:", error);
@@ -129,7 +133,8 @@ export function ContactForm() {
                             ></textarea>
                         </div>
 
-                        {/* reCAPTCHA Component */}
+                        {/*
+                        reCAPTCHA disabled.
                         <div className="flex justify-center">
                             {!isDevelopment && recaptchaSiteKey ? (
                                 <ReCAPTCHA
@@ -148,6 +153,7 @@ export function ContactForm() {
                                 </div>
                             )}
                         </div>
+                        */}
 
                         <Button type="submit" className="w-full h-12 rounded-md font-bold text-base" disabled={isSubmitting}>
                             {isSubmitting ? (
