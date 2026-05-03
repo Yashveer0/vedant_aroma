@@ -10,6 +10,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://72.60.101.227:3000",   
+  "http://72.60.101.227:3001",   
   "https://vedant-fe.vercel.app",
   "https://www.vedantgurukul.com",
   "https://vedantgurukul.com",
