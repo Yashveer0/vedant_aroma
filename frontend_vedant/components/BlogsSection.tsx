@@ -95,7 +95,7 @@ export function BlogSection({ title, subtitle, filterParams, className, viewAllL
   }, [filterParams]);
 
   // Use the existing blog state structure
-  const { posts: blogs, loading, error } = useSelector((state: RootState) => state.blog);
+  const { posts: blogs, loading, error, hasFetchedPublishedBlogs } = useSelector((state: RootState) => state.blog);
 
   // Filter blogs based on filterParams if needed
   const filteredBlogs = useMemo(() => {
@@ -120,11 +120,10 @@ export function BlogSection({ title, subtitle, filterParams, className, viewAllL
   }, [blogs, filterParams]);
 
   useEffect(() => {
-    // Fetch blogs if not already loaded
-    if (blogs.length === 0 && !loading) {
+    if (!hasFetchedPublishedBlogs && !loading) {
       dispatch(fetchPublishedBlogs({}));
     }
-  }, [dispatch, blogs.length, loading]);
+  }, [dispatch, hasFetchedPublishedBlogs, loading]);
 
   const handleRetry = useCallback(() => {
     dispatch(fetchPublishedBlogs({}));

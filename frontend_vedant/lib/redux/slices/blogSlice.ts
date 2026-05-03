@@ -33,6 +33,8 @@ interface BlogState {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
+  hasFetchedPublishedBlogs: boolean;
+  hasFetchedAllBlogs: boolean;
   loading: boolean; 
   error: string | null;
   selectedPost: Blog | null;
@@ -47,12 +49,21 @@ interface FetchBlogsParams {
   search?: string;
 }
 
+type BlogListPayload = {
+  blogs: Blog[];
+  currentPage: number;
+  totalPages: number;
+  totalPosts?: number;
+  totalBlogs?: number;
+};
 
 const initialState: BlogState = {
   posts: [],
   currentPage: 1,
   totalPages: 1,
   totalPosts: 0,
+  hasFetchedPublishedBlogs: false,
+  hasFetchedAllBlogs: false,
   loading: false,
   error: null,
   selectedPost: null,
@@ -74,6 +85,12 @@ export const fetchPublishedBlogs = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch blogs');
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { blog } = getState() as { blog: BlogState };
+      return !blog.loading;
+    },
   }
 );
 
@@ -91,6 +108,12 @@ export const fetchBlogs = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch blogs');
     }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { blog } = getState() as { blog: BlogState };
+      return !blog.loading;
+    },
   }
 );
 
@@ -144,7 +167,6 @@ export const updateBlogPost = createAsyncThunk(
   'blogs/updateBlogPost',
   async ({ blogId, formData }: { blogId: string, formData: FormData }, { rejectWithValue }) => {
     try {
-      console.log("formdata", formData)
       const response = await apiClient.patch(`${API_BASE_URL}/update/${blogId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -176,32 +198,36 @@ const blogSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchBlogs.fulfilled, (state, action: PayloadAction<{ blogs: Blog[], currentPage: number, totalPages: number, totalPosts: number }>) => {
+      .addCase(fetchBlogs.fulfilled, (state, action: PayloadAction<BlogListPayload>) => {
         state.loading = false;
         state.posts = action.payload.blogs; 
         state.currentPage = action.payload.currentPage;
         state.totalPages = action.payload.totalPages;
-        state.totalPosts = action.payload.totalPosts;
+        state.totalPosts = action.payload.totalPosts ?? action.payload.totalBlogs ?? 0;
+        state.hasFetchedAllBlogs = true;
     })
       .addCase(fetchBlogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.hasFetchedAllBlogs = true;
       })
 
       .addCase(fetchPublishedBlogs.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchPublishedBlogs.fulfilled, (state, action: PayloadAction<{ blogs: Blog[], currentPage: number, totalPages: number, totalPosts: number }>) => {
+      .addCase(fetchPublishedBlogs.fulfilled, (state, action: PayloadAction<BlogListPayload>) => {
         state.loading = false;
         state.posts = action.payload.blogs; 
         state.currentPage = action.payload.currentPage;
         state.totalPages = action.payload.totalPages;
-        state.totalPosts = action.payload.totalPosts;
+        state.totalPosts = action.payload.totalPosts ?? action.payload.totalBlogs ?? 0;
+        state.hasFetchedPublishedBlogs = true;
     })
       .addCase(fetchPublishedBlogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.hasFetchedPublishedBlogs = true;
       })
       
       .addCase(fetchBlogBySlug.pending, (state) => {
