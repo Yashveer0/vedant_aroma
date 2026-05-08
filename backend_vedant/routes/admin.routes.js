@@ -34,20 +34,6 @@ router.route("/orders/recent").get(getRecentAdminOrders);
 router.route("/orders/:orderId/status").patch(updateOrderStatus);
 router.route("/orders/all").get(getAllAdminOrders);
 
-router.route("/products").post(
-  upload.fields([
-    {
-      name: "images",
-      maxCount: 5, // Allow up to 5 images
-    },
-    {
-      name: "video",
-      maxCount: 1, // Allow up to 1 video
-    },
-  ]),
-  createProduct
-);
-
 // GET all products (with search/filter) & CREATE a new product
 router
   .route("/products")

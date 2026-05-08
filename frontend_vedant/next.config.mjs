@@ -18,6 +18,20 @@ const apiProxyOrigin = (
   DEFAULT_API_PROXY_ORIGIN
 ).replace(/\/+$/, '');
 
+const uploadRemotePattern = (() => {
+  try {
+    const url = new URL(apiProxyOrigin);
+    return {
+      protocol: url.protocol.replace(':', ''),
+      hostname: url.hostname,
+      port: url.port,
+      pathname: '/uploads/**',
+    };
+  } catch {
+    return undefined;
+  }
+})();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   devIndicators: false,
@@ -29,12 +43,17 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: uploadRemotePattern ? [uploadRemotePattern] : [],
   },
   async rewrites() {
     return [
       {
         source: '/api/v1/:path*',
         destination: `${apiProxyOrigin}/api/v1/:path*`,
+      },
+      {
+        source: '/uploads/:path*',
+        destination: `${apiProxyOrigin}/uploads/:path*`,
       },
     ];
   },

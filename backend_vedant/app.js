@@ -2,10 +2,15 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
 import mainRouter from "./routes/index.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, "public");
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -39,7 +44,7 @@ app.use(express.json({ limit: "500mb" }));
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use(cookieParser());
 
-app.use(express.static("public"));
+app.use(express.static(publicDir));
 
 app.get("/health", (req, res) => {
   res.status(200).json({

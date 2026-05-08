@@ -156,6 +156,7 @@ export function AddProductModal({ isOpen, onClose, onSave }: AddProductModalProp
 
     data.append('type', "product")
 
+    data.delete('video');
     imageFiles.forEach(file => { if (file) data.append('images', file); });
     if (videoFile) data.append('video', videoFile);
     try {
