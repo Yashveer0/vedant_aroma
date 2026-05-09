@@ -1,7 +1,7 @@
 // src/components/ProductCard.tsx
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,7 @@ import { AppDispatch } from '@/lib/redux/store';
 import { selectIsAuthenticated } from '@/lib/redux/slices/authSlice';
 import { addToCart as addCartToDb } from '@/lib/redux/slices/cartSlice';
 import { useCart as useLocalCart } from '@/context/CartContext';
+import { resolveMediaUrls } from '@/lib/media';
 
 // --- WISHLIST IMPORTS ---
 import {
@@ -108,9 +109,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const discount = base_price && base_price > price ? Math.round(((base_price - price) / base_price) * 100) : 0;
   const minQuantity = useMemo(() => originalProduct.minQuantity || 1, [originalProduct.minQuantity]);
   const isBulkOrder = minQuantity > 5;
+  const resolvedImages = useMemo(() => resolveMediaUrls(images), [images]);
+  const checkoutHref = isAuthenticated ? "/checkout" : "/login?redirect=/checkout";
+  const [primaryImageSrc, setPrimaryImageSrc] = useState(resolvedImages?.[0] || '/placeholder.svg');
+
+  useEffect(() => {
+    setPrimaryImageSrc(resolvedImages?.[0] || '/placeholder.svg');
+  }, [resolvedImages]);
 
   // --- HANDLER FUNCTIONS ---
-  const handlePrimaryAddToCartClick = (e: React.MouseEvent) => {
+  const handlePrimaryAddToCartClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -135,19 +143,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         return;
       }
 
-      if (isAuthenticated) {
-        dispatch(addCartToDb({ productId, quantity: minQuantity }));
-      } else {
-        addCartToLocal(originalProduct, undefined, minQuantity);
+      try {
+        if (isAuthenticated) {
+          await dispatch(addCartToDb({ productId, quantity: minQuantity })).unwrap();
+        } else {
+          addCartToLocal(originalProduct, undefined, minQuantity);
+        }
+      } catch (error: any) {
+        toast.error("Failed to Add to Cart", {
+          description: typeof error === "string" ? error : "Please try again.",
+        });
+        return;
       }
 
       setIsAddedToCart(true);
       setTimeout(() => setIsAddedToCart(false), 2000);
       toast.success("Added to Cart!", { description: `${minQuantity} x ${name} has been added.` });
+      router.push(checkoutHref);
     }
   };
 
-  const handleConfirmAddToCart = () => {
+  const handleConfirmAddToCart = async () => {
     if (!selectedVariant) {
       toast.error("Please select an option");
       return;
@@ -159,14 +175,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return;
     }
 
-    if (isAuthenticated) {
-      dispatch(addCartToDb({
-        productId,
-        quantity,
-        sku_variant: selectedVariant.sku
-      }));
-    } else {
-      addCartToLocal(originalProduct, selectedVariant, quantity);
+    try {
+      if (isAuthenticated) {
+        await dispatch(addCartToDb({
+          productId,
+          quantity,
+          sku_variant: selectedVariant.sku
+        })).unwrap();
+      } else {
+        addCartToLocal(originalProduct, selectedVariant, quantity);
+      }
+    } catch (error: any) {
+      toast.error("Failed to Add to Cart", {
+        description: typeof error === "string" ? error : "Please try again.",
+      });
+      return;
     }
 
     setIsAddedToCart(true);
@@ -175,6 +198,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       description: `${quantity} x ${name} (${selectedVariant.name}) has been added.`
     });
     setIsVariantSelectorOpen(false);
+    router.push(checkoutHref);
   };
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
@@ -222,8 +246,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <Link href={`/product/${slug || '#'}`} className="group block">
         <div className="relative bg-gray-100 rounded-xl overflow-hidden aspect-[3/4]">
           <div className="absolute inset-0 transition-transform duration-500 ease-in-out group-hover:scale-105">
-            <Image src={images?.[0] || '/placeholder.svg'} alt={name} fill sizes="(max-width: 768px) 50vw, 33vw" className={`object-cover w-full h-full transition-opacity duration-500 ease-in-out ${images?.[1] ? 'group-hover:opacity-0' : ''}`} />
-            {images?.[1] && <Image src={images[1]} alt={`${name} hover view`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover w-full h-full transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100" />}
+            <Image
+              src={primaryImageSrc}
+              alt={name}
+              fill
+              sizes="(max-width: 768px) 50vw, 33vw"
+              onError={() => setPrimaryImageSrc('/placeholder.svg')}
+              className={`object-cover w-full h-full transition-opacity duration-500 ease-in-out ${resolvedImages?.[1] ? 'group-hover:opacity-0' : ''}`}
+            />
+            {resolvedImages?.[1] && primaryImageSrc !== '/placeholder.svg' && (
+              <Image
+                src={resolvedImages[1]}
+                alt={`${name} hover view`}
+                fill
+                sizes="(max-width: 768px) 50vw, 33vw"
+                onError={(event) => {
+                  event.currentTarget.style.display = 'none';
+                }}
+                className="object-cover w-full h-full transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100"
+              />
+            )}
           </div>
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
             {tags?.includes('Sale') && <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">SALE</span>}

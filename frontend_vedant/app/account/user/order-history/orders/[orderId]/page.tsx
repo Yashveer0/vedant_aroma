@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { resolveMediaUrl } from '@/lib/media';
 import type { RootState, AppDispatch } from '@/lib/redux/store';
 import Navbar  from '@/components/Navbar';
 import Footer  from '@/components/Footer';
@@ -493,7 +494,7 @@ export default function UserOrderDetailsPage() {
                     return (
                       <div key={item._id} className="flex items-center space-x-4 p-4 border-b last:border-b-0">
                         <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border">
-                          <Image src={item.image || '/placeholder.svg'} alt={productName} fill sizes="80px" className="object-cover" />
+                          <Image src={resolveMediaUrl(item.image)} alt={productName} fill sizes="80px" className="object-cover" />
                         </div>
                         <div className="flex-grow">
                           <p className="font-semibold text-gray-800">{productName}</p>

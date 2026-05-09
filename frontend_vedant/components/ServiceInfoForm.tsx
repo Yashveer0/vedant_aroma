@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input'; // Import the Input component
+import { resolveMediaUrl } from '@/lib/media';
 
 // --- Type Definitions ---
 interface ServiceItem {
@@ -96,7 +97,7 @@ export const ServiceInfoForm: React.FC<ServiceInfoFormProps> = ({ serviceItems, 
                         {/* Service Header */}
                         <div className="flex items-start space-x-4">
                             <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                <Image src={item.image || "/placeholder.svg"} alt={item.product.name} fill className="object-cover" />
+                                <Image src={resolveMediaUrl(item.image)} alt={item.product.name} fill className="object-cover" />
                             </div>
                             <div className="flex-1">
                                 <h4 className="font-semibold">{item.product.name}</h4>

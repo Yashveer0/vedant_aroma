@@ -1,9 +1,164 @@
+import crypto from "node:crypto";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import {shiprocketApi} from "../utils/shiprocketService.js";
+import { shiprocketApi } from "../utils/shiprocketService.js";
 import { Order } from "../models/order.model.js";
+import { getShiprocketShippingRate } from "../services/shippingService.js";
 
+const hasValue = (value) => value !== undefined && value !== null && String(value).trim() !== "";
+
+const cleanValue = (value) => {
+    if (!hasValue(value)) return undefined;
+    return String(value).trim();
+};
+
+const firstValue = (...values) => values.map(cleanValue).find(Boolean);
+
+const readBearerToken = (authorizationHeader) => {
+    const authorization = cleanValue(authorizationHeader);
+    if (!authorization) return undefined;
+    return authorization.toLowerCase().startsWith("bearer ")
+        ? authorization.slice(7).trim()
+        : authorization;
+};
+
+const tokensMatch = (incomingToken, expectedToken) => {
+    if (!incomingToken || !expectedToken) return false;
+    const incoming = Buffer.from(incomingToken);
+    const expected = Buffer.from(expectedToken);
+    return incoming.length === expected.length && crypto.timingSafeEqual(incoming, expected);
+};
+
+const getWebhookToken = (req) => firstValue(
+    req.query?.token,
+    req.headers?.["x-shiprocket-webhook-secret"],
+    req.headers?.["x-webhook-token"],
+    req.headers?.["x-api-key"],
+    readBearerToken(req.headers?.authorization)
+);
+
+const verifyShiprocketWebhookSecret = (req) => {
+    const configuredSecret = cleanValue(process.env.SHIPROCKET_WEBHOOK_SECRET);
+    if (!configuredSecret) return;
+
+    const incomingToken = getWebhookToken(req);
+    if (!tokensMatch(incomingToken, configuredSecret)) {
+        throw new ApiError(401, "Invalid Shiprocket webhook token.");
+    }
+};
+
+const getWebhookSources = (payload) => {
+    const root = Array.isArray(payload) ? payload[0] : payload;
+    const body = root && typeof root === "object" ? root : {};
+
+    return [
+        body,
+        body.data,
+        body.payload,
+        body.shipment,
+        body.shipment_data,
+        body.order,
+        body.order_data,
+        body.data?.shipment,
+        body.data?.order,
+        body.payload?.shipment,
+        body.payload?.order,
+    ].filter((source) => source && typeof source === "object");
+};
+
+const pickWebhookField = (sources, keys) => {
+    for (const source of sources) {
+        for (const key of keys) {
+            const value = cleanValue(source[key]);
+            if (value) return value;
+        }
+    }
+    return undefined;
+};
+
+const extractShiprocketWebhookFields = (payload) => {
+    const sources = getWebhookSources(payload);
+
+    return {
+        eventName: pickWebhookField(sources, ["event", "event_name", "type", "webhook_event", "activity"]),
+        statusText: pickWebhookField(sources, [
+            "current_status",
+            "shipment_status",
+            "shipment_status_name",
+            "status",
+            "status_name",
+            "latest_status",
+        ]),
+        statusId: pickWebhookField(sources, ["current_status_id", "shipment_status_id", "status_id"]),
+        awb: pickWebhookField(sources, ["awb", "awb_code", "awb_number", "tracking_number", "tracking_no"]),
+        courier: pickWebhookField(sources, ["courier", "courier_name", "courier_company", "courier_company_name"]),
+        trackingUrl: pickWebhookField(sources, ["tracking_url", "track_url", "shipment_track_url"]),
+        shipmentId: pickWebhookField(sources, ["shipment_id", "shiprocket_shipment_id", "sr_shipment_id"]),
+        shiprocketOrderId: pickWebhookField(sources, ["shiprocket_order_id", "sr_order_id", "order_id"]),
+        channelOrderId: pickWebhookField(sources, [
+            "channel_order_id",
+            "channel_order_no",
+            "channel_order_number",
+            "reference_id",
+            "order_number",
+            "order_id",
+        ]),
+    };
+};
+
+const getLocalOrderStatusFromShiprocket = (statusText = "") => {
+    const status = statusText.toLowerCase();
+
+    if (status.includes("cancel") || status.includes("rto") || status.includes("return")) {
+        return "Cancelled";
+    }
+
+    if (status.includes("delivered")) {
+        return "Delivered";
+    }
+
+    if (
+        status.includes("shipped") ||
+        status.includes("in transit") ||
+        status.includes("out for delivery") ||
+        status.includes("picked") ||
+        status.includes("pickup") ||
+        status.includes("manifest") ||
+        status.includes("awb") ||
+        status.includes("ready to ship")
+    ) {
+        return "Shipped";
+    }
+
+    return null;
+};
+
+const buildShiprocketOrderLookup = ({ shipmentId, shiprocketOrderId, channelOrderId, awb }) => {
+    const conditions = [];
+    const uniqueIds = [...new Set([shiprocketOrderId, channelOrderId].filter(Boolean))];
+
+    for (const id of uniqueIds) {
+        conditions.push({ "shipmentDetails.shiprocketOrderId": id });
+        conditions.push({ "shipmentDetails.shiprocketChannelOrderId": id });
+    }
+
+    if (shipmentId) {
+        conditions.push({ "shipmentDetails.shiprocketShipmentId": shipmentId });
+    }
+
+    if (awb) {
+        conditions.push({ "shipmentDetails.trackingNumber": awb });
+    }
+
+    return conditions;
+};
+
+const addSetIfPresent = (update, path, value) => {
+    if (hasValue(value)) {
+        update.$set[path] = cleanValue(value);
+    }
+};
 
 /**
  * @desc Checks courier serviceability and gets shipping rates
@@ -11,52 +166,108 @@ import { Order } from "../models/order.model.js";
  * @access Private (Logged-in User)
  */
 const checkServiceability = asyncHandler(async (req, res) => {
-    const { delivery_postcode, weight_in_kg = 0.5 } = req.body;
-    console.log("----delivery_postcode,weight_in_kg ---", delivery_postcode, weight_in_kg)
+    const { delivery_postcode, weight_in_kg = 0.5, cod = false } = req.body;
     if (!delivery_postcode) {
-        console.log("---delivery_postcode error---")
         throw new ApiError(400, "Delivery pincode is required.");
     }
 
-    const pickup_postcode = process.env.PICKUP_PINCODE;
-    console.log("pickup postcode ", pickup_postcode)
-    if (!pickup_postcode) {
-        console.log("---!pickup_postcode error---")
-        throw new ApiError(500, "Pickup pincode is not configured on the server.");
-    }
-
     try {
-        const response = await shiprocketApi.get('/courier/serviceability/', {
-            params: {
-                pickup_postcode,
-                delivery_postcode,
-                weight: weight_in_kg, // weight must be in kg
-                cod: 1, // Check for both prepaid and COD
-            }
+        const shippingQuote = await getShiprocketShippingRate({
+            deliveryPostcode: delivery_postcode,
+            weightInKg: weight_in_kg,
+            cod,
         });
-        // console.log("---- response ----",response)
-        const data = response.data.data;
-
-        if (response.data.status !== 200 || data.available_courier_companies?.length === 0) {
-            console.log("------No shipping service available for this pincode------")
-            return res.status(200).json(new ApiResponse(200, { shippingPrice: null }, "No shipping service available for this pincode."));
-        }
-
-        // Find the rate for the courier company recommended by Shiprocket
-        const recommendedCourierId = data.recommended_courier_company_id;
-        const recommendedCourier = data.available_courier_companies.find(c => c.courier_company_id == recommendedCourierId);
-
-        console.log("-----recommendedCourierId, recommendedCourier--------")
-        // If the recommended one isn't found, take the first from the list (usually the cheapest)
-        const shippingPrice = recommendedCourier ? recommendedCourier.rate : data.available_courier_companies[0].rate;
-        console.log("--------shippingPrice---------")
-
-        return res.status(200).json(new ApiResponse(200, { shippingPrice }, "Shipping rate calculated successfully."));
+        return res.status(200).json(new ApiResponse(200, shippingQuote, "Shipping rate calculated successfully."));
 
     } catch (error) {
         console.error("Shiprocket serviceability error:", error.response?.data || error.message);
-        throw new ApiError(500, "Error fetching shipping availability.");
+        if (error instanceof ApiError && error.statusCode === 400) {
+            return res.status(200).json(
+                new ApiResponse(200, { shippingPrice: null }, "No shipping service available for this pincode.")
+            );
+        }
+        throw error;
     }
+});
+
+export const shiprocketWebhookHealth = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(200, { ok: true }, "Shiprocket webhook endpoint is active.")
+    );
+});
+
+export const handleShiprocketWebhook = asyncHandler(async (req, res) => {
+    verifyShiprocketWebhookSecret(req);
+
+    const webhookFields = extractShiprocketWebhookFields(req.body);
+    const statusForShipment = firstValue(
+        webhookFields.statusText,
+        webhookFields.eventName,
+        webhookFields.statusId && `Status ${webhookFields.statusId}`
+    );
+    const lookupConditions = buildShiprocketOrderLookup(webhookFields);
+
+    if (!lookupConditions.length) {
+        console.warn("Shiprocket webhook received without usable order identifiers:", req.body);
+        return res.status(200).json(
+            new ApiResponse(200, { matched: false }, "Shiprocket webhook received, but no order identifier was found.")
+        );
+    }
+
+    const order = await Order.findOne({ $or: lookupConditions });
+
+    if (!order) {
+        console.warn("Shiprocket webhook did not match any local order:", webhookFields);
+        return res.status(200).json(
+            new ApiResponse(200, { matched: false }, "Shiprocket webhook received, but no matching local order was found.")
+        );
+    }
+
+    const update = {
+        $set: {
+            "shipmentDetails.webhookReceivedAt": new Date(),
+        },
+    };
+
+    addSetIfPresent(update, "shipmentDetails.status", statusForShipment);
+    addSetIfPresent(update, "shipmentDetails.webhookStatus", webhookFields.statusText);
+    addSetIfPresent(update, "shipmentDetails.webhookEvent", webhookFields.eventName);
+    addSetIfPresent(update, "shipmentDetails.shiprocketShipmentId", webhookFields.shipmentId);
+    addSetIfPresent(update, "shipmentDetails.shiprocketOrderId", webhookFields.shiprocketOrderId);
+    addSetIfPresent(update, "shipmentDetails.shiprocketChannelOrderId", webhookFields.channelOrderId);
+    addSetIfPresent(update, "shipmentDetails.trackingNumber", webhookFields.awb);
+    addSetIfPresent(update, "shipmentDetails.courier", webhookFields.courier);
+    addSetIfPresent(update, "shipmentDetails.trackingUrl", webhookFields.trackingUrl);
+
+    const localStatus = getLocalOrderStatusFromShiprocket(statusForShipment || "");
+    if (localStatus === "Cancelled") {
+        update.$set.orderStatus = "Cancelled";
+        update.$set["cancellationDetails.cancelledBy"] = order.cancellationDetails?.cancelledBy || "Admin";
+        update.$set["cancellationDetails.reason"] =
+            order.cancellationDetails?.reason || `Cancelled in Shiprocket${statusForShipment ? `: ${statusForShipment}` : ""}`;
+        update.$set["cancellationDetails.cancellationDate"] =
+            order.cancellationDetails?.cancellationDate || new Date();
+    } else if (localStatus === "Delivered" && order.orderStatus !== "Cancelled") {
+        update.$set.orderStatus = "Delivered";
+    } else if (
+        localStatus === "Shipped" &&
+        !["Cancelled", "Delivered"].includes(order.orderStatus)
+    ) {
+        update.$set.orderStatus = "Shipped";
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(order._id, update, {
+        new: true,
+        runValidators: true,
+    }).select("_id orderStatus shipmentDetails cancellationDetails");
+
+    console.log(
+        `Shiprocket webhook synced order ${updatedOrder._id}: ${statusForShipment || "status received"}`
+    );
+
+    return res.status(200).json(
+        new ApiResponse(200, { matched: true, order: updatedOrder }, "Shiprocket webhook processed successfully.")
+    );
 });
 
 export const trackOrder = asyncHandler(async (req, res) => {

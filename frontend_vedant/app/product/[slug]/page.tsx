@@ -28,6 +28,7 @@ import { selectIsAuthenticated } from "@/lib/redux/slices/authSlice";
 import { addToCart as addCartToDb } from "@/lib/redux/slices/cartSlice";
 import { useCart as useLocalCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { resolveMediaUrls } from "@/lib/media";
 import { 
   addToWishlist as addWishlistToDb, 
   removeFromWishlist as removeWishlistFromDb,
@@ -65,6 +66,7 @@ const ProductDetailsPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariantSku, setSelectedVariantSku] = useState<string | null>(null);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const checkoutHref = isAuthenticated ? "/checkout" : "/login?redirect=/checkout";
 
   // --- Check wishlist status from Redux OR local context ---
   const isInReduxWishlist = useSelector((state: RootState) => 
@@ -195,6 +197,7 @@ const ProductDetailsPage = () => {
 
     // 2 seconds baad button ko reset karein
     setTimeout(() => setIsAddedToCart(false), 2000);
+    router.push(checkoutHref);
   };
 
   // --- OPTIMISTIC WISHLIST TOGGLE HANDLER ---
@@ -246,6 +249,9 @@ const ProductDetailsPage = () => {
   
   const incrementQuantity = () => setQuantity(q => Math.min(q + 1, currentStock));
   const decrementQuantity = () => setQuantity(q => Math.max(minQuantity, q - 1));
+  const galleryImages = resolveMediaUrls(product?.images).length > 0
+    ? resolveMediaUrls(product?.images)
+    : ["/placeholder.svg"];
 
   // --- Render Logic ---
   if (loading) return ( <div className="bg-gray-50"><Navbar /><ProductDetailsSkeleton /><Footer /></div> );
@@ -259,14 +265,14 @@ const ProductDetailsPage = () => {
           {/* LEFT: MEDIA GALLERY */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col-reverse md:flex-row gap-4">
             <div className="flex md:flex-col gap-3 md:overflow-y-auto pb-2 md:pb-0 md:pr-2">
-              {product.images.map((img: string, idx: number) => (
+              {galleryImages.map((img: string, idx: number) => (
                 <button key={idx} onClick={() => setSelectedImage(idx)} className={`relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${selectedImage === idx ? 'border-primary' : 'border-transparent'}`}>
                   <Image src={img} alt={`${product.name} thumbnail ${idx + 1}`} fill className="object-cover" />
                 </button>
               ))}
             </div>
             <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100">
-              <Image src={product.images[selectedImage]} alt={product.name} fill className="object-cover" />
+              <Image src={galleryImages[selectedImage] || galleryImages[0]} alt={product.name} fill className="object-cover" />
             </div>
           </motion.div>
 

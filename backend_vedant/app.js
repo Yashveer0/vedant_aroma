@@ -46,6 +46,10 @@ app.use(cookieParser());
 
 app.use(express.static(publicDir));
 
+app.get("/uploads/*", (req, res) => {
+  res.sendFile(path.join(publicDir, "placeholder.svg"));
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,

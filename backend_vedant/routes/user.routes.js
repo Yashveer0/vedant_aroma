@@ -19,12 +19,11 @@ import {
   getMyOrders,
   getSingleOrder,
   setDefaultAddress,
-  placeCodOrder,
   mergeLocalCart,
   mergeLocalWishlist
 } from "../controllers/user.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { cancelOrder } from "../controllers/payment.controller.js";
+import { cancelOrder, placeCodOrder } from "../controllers/payment.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();

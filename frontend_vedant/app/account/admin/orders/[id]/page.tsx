@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { resolveMediaUrl } from '@/lib/media';
 import type { RootState, AppDispatch } from '@/lib/redux/store';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -329,7 +330,7 @@ export default function AdminOrderDetailsPage() {
                   <div key={index} className="flex items-center space-x-4 p-4 border-b last:border-b-0">
                     <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border">
                       <Image 
-                        src={item.image || item.product_id?.images?.[0] || '/placeholder.svg'} 
+                        src={resolveMediaUrl(item.image || item.product_id?.images?.[0])}
                         alt={item.product_name || item.name || 'Product'} 
                         fill 
                         sizes="80px"

@@ -9,6 +9,7 @@ import  Navbar  from '@/components/Navbar';
 import  Footer  from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Loader2, CircleCheck, RefreshCw, Truck, XCircle, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { resolveMediaUrl } from '@/lib/media';
 
 import { fetchMyOrders, Order } from '@/lib/redux/slices/orderSlice';
 
@@ -49,7 +50,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                     // --- FIX 1: 'item.product_name' ka istemal karein ---
                     alt={item.product_name? item.product_name: ""} 
                     // --- FIX 2: 'item.image' ka istemal karein ---
-                    src={item.image || '/placeholder.svg'} 
+                    src={resolveMediaUrl(item.image)}
                     fill 
                     sizes="64px"
                     className="object-cover" 
@@ -185,5 +186,4 @@ export default function MyOrdersPage() {
     </div>
   )
 }
-
 

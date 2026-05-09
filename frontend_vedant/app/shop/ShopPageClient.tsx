@@ -18,6 +18,7 @@ import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import ProductGridSkeleton from '@/components/skeleton/ProductGridSkeleton';
+import { resolveMediaUrls } from '@/lib/media';
 
 const MAX_PRICE = 8000;
 
@@ -174,16 +175,19 @@ export default function ShopPageClient() {
   const mappedProducts = useMemo(() => 
     products
       .filter(p => p && p._id && p.name && p.slug)
-      .map(p => ({
-        _id: p._id!,
-        name: p.name,
-        slug: p.slug,
-        images: p.images || [],
-        tags: p.tags || [],
-        price: p.sale_price ?? p.price ?? 0,
-        base_price: p.sale_price ? p.price : undefined,
-        originalProduct: p,
-      })), 
+      .map(p => {
+        const images = resolveMediaUrls(p.images);
+        return {
+          _id: p._id!,
+          name: p.name,
+          slug: p.slug,
+          images,
+          tags: p.tags || [],
+          price: p.sale_price ?? p.price ?? 0,
+          base_price: p.sale_price ? p.price : undefined,
+          originalProduct: { ...p, images },
+        };
+      }),
     [products]
   );
 

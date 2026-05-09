@@ -4,6 +4,7 @@ import { Product, Review } from '@/lib/types/product';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api/auth';
 import { API_BASE_URL } from '@/lib/api/config';
+import { resolveMediaUrl, resolveMediaUrls } from '@/lib/media';
 
 // --- Type Definitions ---
 
@@ -30,6 +31,12 @@ interface ProductState {
   searchResults: Product[]; 
   searchLoading: boolean; 
 }
+
+const normalizeProductMedia = (product: Product): Product => ({
+  ...product,
+  images: resolveMediaUrls(product.images),
+  video: product.video ? resolveMediaUrl(product.video) : product.video,
+});
 
 // --- Initial State ---
 
@@ -65,7 +72,11 @@ export const fetchProducts = createAsyncThunk(
         if (value) params.append(key, String(value));
       });
       const response = await axios.get(`${API_BASE_URL}/products?${params.toString()}`);
-      return response.data.data;
+      const data = response.data.data;
+      return {
+        ...data,
+        products: (data.products || []).map(normalizeProductMedia),
+      };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
     }
@@ -81,7 +92,7 @@ export const fetchSearchResults = createAsyncThunk(
         if (value) params.append(key, String(value));
       });
       const response = await axios.get(`${API_BASE_URL}/products?${params.toString()}`);
-      return response.data.data.products; 
+      return (response.data.data.products || []).map(normalizeProductMedia);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Search failed');
     }
@@ -93,7 +104,7 @@ export const fetchProductBySlug = createAsyncThunk(
   async (slug: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/products/slug/${slug}`);
-      return response.data.data;
+      return normalizeProductMedia(response.data.data);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch product");
     }
@@ -105,7 +116,7 @@ export const fetchProductById = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/products/${id}`);
-      return response.data.data;
+      return normalizeProductMedia(response.data.data);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch product");
     }

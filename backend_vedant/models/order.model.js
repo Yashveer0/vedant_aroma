@@ -17,6 +17,11 @@ const orderSchema = new mongoose.Schema(
     orderItems: [
       {
         product_name: { type: String, required: true },
+        product_type: {
+          type: String,
+          enum: ["product", "service"],
+          default: "product",
+        },
         quantity: { type: Number, required: true },
         price_per_item: { type: Number, required: true },
         image: { type: String, required: true },
@@ -25,43 +30,39 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        // Variant specific details
         sku_variant: { type: String },
         size: { type: String },
         color: { type: String },
-        
-        userInput: { 
+        userInput: {
           type: String,
-          trim: true 
-      },
+          trim: true,
+        },
       },
     ],
     shippingAddress: {
       type: shippingAddressSchema,
-      // required: true,
     },
     itemsPrice: { type: Number, required: true },
-    shippingPrice: { type: Number },
-    taxPrice: { type: Number, required: true },
-    discountAmount: { type: Number, default: 0 }, 
-    couponCode: { type: String }, 
+    shippingPrice: { type: Number, default: 0 },
+    taxPrice: { type: Number, required: true, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    couponCode: { type: String },
     totalPrice: { type: Number, required: true },
     orderStatus: {
       type: String,
       required: true,
-      enum: [
-        "Pending",
-        "Paid",
-        "Processing",
-        "Shipped",
-        "Delivered",
-        "Cancelled",
-      ],
+      enum: ["Pending", "Paid", "Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Paid",
     },
-
     paymentId: { type: String },
     razorpayOrderId: { type: String },
+    razorpaySignature: { type: String },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded", "partially_refunded"],
+      default: "paid",
+    },
+    paidAt: { type: Date },
     paymentMethod: {
       type: String,
       enum: ["COD", "Razorpay"],
@@ -69,16 +70,20 @@ const orderSchema = new mongoose.Schema(
       default: "Razorpay",
     },
     shipmentDetails: {
-      // This is the Shiprocket Shipment ID, used for most operations
+      shiprocketChannelOrderId: { type: String },
       shiprocketShipmentId: { type: String },
-      // This is the Shiprocket Order ID, mainly for reference
       shiprocketOrderId: { type: String },
-      // This is the AWB (Air Waybill) / Tracking Number
       trackingNumber: { type: String },
-      // Name of the courier company (e.g., Delhivery, XpressBees)
       courier: { type: String },
-      // Direct tracking URL you can provide to the customer
       trackingUrl: { type: String },
+      status: { type: String },
+      pickupStatus: { type: String },
+      lastError: { type: String },
+      awbAssignedAt: { type: Date },
+      pickupScheduledAt: { type: Date },
+      webhookEvent: { type: String },
+      webhookStatus: { type: String },
+      webhookReceivedAt: { type: Date },
     },
     refundDetails: {
       refundId: String,
@@ -97,5 +102,12 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ paymentId: 1 }, { sparse: true });
+orderSchema.index({ razorpayOrderId: 1 }, { sparse: true });
+orderSchema.index({ "shipmentDetails.shiprocketChannelOrderId": 1 }, { sparse: true });
+orderSchema.index({ "shipmentDetails.shiprocketOrderId": 1 }, { sparse: true });
+orderSchema.index({ "shipmentDetails.shiprocketShipmentId": 1 }, { sparse: true });
 
 export const Order = mongoose.model("Order", orderSchema);

@@ -12,12 +12,14 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/lib/redux/store';
 import { clearLocalCartState } from '@/lib/redux/slices/cartSlice';
 import { useToast } from "@/hooks/use-toast"; // <-- IMPORT useToast
+import { useCart as useLocalCart } from "@/context/CartContext";
 
 export default function OrderSuccessClient() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast(); // <-- GET THE TOAST FUNCTION
+  const { clearCart } = useLocalCart();
 
   const orderId = searchParams.get('orderId');
   const serviceOrdered = searchParams.get('service_ordered'); // <-- GET THE NEW PARAMETER
@@ -25,7 +27,8 @@ export default function OrderSuccessClient() {
   // This useEffect clears the cart state, which is correct.
   useEffect(() => {
     dispatch(clearLocalCartState());
-  }, [dispatch]);
+    clearCart();
+  }, [dispatch, clearCart]);
 
   // This useEffect handles the redirect if orderId is missing.
   useEffect(() => {

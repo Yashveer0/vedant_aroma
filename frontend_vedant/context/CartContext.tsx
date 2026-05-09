@@ -1,6 +1,7 @@
 "use client"
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react"
 import type { Product, Variant } from "@/lib/types/product"
+import { resolveMediaUrl } from "@/lib/media"
 
 export interface LocalCartItem {
   productId: string;
@@ -78,7 +79,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         quantity,
         name: product.name,
         slug: product.slug,
-        image: product.images[0] || '/placeholder.svg', // Variants don't have images, use product images
+        image: resolveMediaUrl(product.images?.[0]), // Variants don't have images, use product images
         price: variant ? (variant.sale_price || variant.price) : (product.sale_price || product.price),
         attributes: variant ? {
           name: variant.name,
@@ -111,7 +112,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     ));
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = useCallback(() => setItems([]), []);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

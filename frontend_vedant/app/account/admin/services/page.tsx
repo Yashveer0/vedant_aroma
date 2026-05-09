@@ -20,6 +20,7 @@ import { Product as Service } from '@/lib/types/product';
 import { AddServiceModal } from '@/components/AddServiceModal';
 import { EditServiceModal } from '@/components/EditServiceModal';
 import { toast } from 'sonner';
+import { resolveMediaUrl } from '@/lib/media';
 import { Loader2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -147,7 +148,7 @@ export default function ServicesPage() {
               
               return (
                 <TableRow key={service._id}>
-                  <TableCell><Image src={service.images[0] || '/placeholder.svg'} alt={service.name} width={48} height={48} className="object-cover rounded-md" /></TableCell>
+                  <TableCell><Image src={resolveMediaUrl(service.images?.[0])} alt={service.name} width={48} height={48} className="object-cover rounded-md" /></TableCell>
                   <TableCell className="font-medium"><Tooltip><TooltipTrigger><p className="max-w-[250px] truncate">{service.name}</p></TooltipTrigger><TooltipContent><p>{service.name}</p></TooltipContent></Tooltip></TableCell>
                   <TableCell>{displayPrice}</TableCell>
                   <TableCell>{slotsText}</TableCell>

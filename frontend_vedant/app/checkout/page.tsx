@@ -26,24 +26,56 @@ import { placeCodOrder, createRazorpayOrder, verifyRazorpayPayment } from "@/lib
 import { ServiceInfoForm } from "@/components/ServiceInfoForm";
 import { selectIsAuthenticated } from "@/lib/redux/slices/authSlice"
 import { fetchTaxConfig } from "@/lib/redux/slices/taxSlice"
+import { useCart as useLocalCart } from "@/context/CartContext"
+import { resolveMediaUrl } from "@/lib/media"
 
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, any>) => {
+      open: () => void;
+      on: (eventName: string, callback: (response: any) => void) => void;
+    };
+  }
+}
 
 // Custom hook to load external scripts like Razorpay
 const useScript = (src: string) => {
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+
   useEffect(() => {
+    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+    if (existingScript) {
+      setStatus(existingScript.dataset.loaded === 'true' || window.Razorpay ? 'ready' : 'loading');
+      const handleLoad = () => setStatus('ready');
+      const handleError = () => setStatus('error');
+      existingScript.addEventListener('load', handleLoad);
+      existingScript.addEventListener('error', handleError);
+      return () => {
+        existingScript.removeEventListener('load', handleLoad);
+        existingScript.removeEventListener('error', handleError);
+      };
+    }
+
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = 'true';
+      setStatus('ready');
+    };
+    script.onerror = () => setStatus('error');
     document.body.appendChild(script);
-    return () => { document.body.removeChild(script); };
   }, [src]);
+
+  return status;
 };
 
 export default function CheckoutPage() {
-  useScript("https://checkout.razorpay.com/v1/checkout.js");
+  const razorpayScriptStatus = useScript("https://checkout.razorpay.com/v1/checkout.js");
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
+  const { clearCart: clearLocalCart } = useLocalCart();
 
   // --- Read all data directly from Redux slices ---
   const { items, subTotal, shippingCost, discountAmount, finalTotal, appliedPoints, taxAmount, appliedCoupon, couponDiscount, pointsDiscount,rupeesPerPoint ,loading: cartLoading, isShippingLoading, shippingPrice } = useSelector((state: RootState) => state.cart);
@@ -84,6 +116,11 @@ export default function CheckoutPage() {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   const [serviceInputs, setServiceInputs] = useState<Record<string, string>>({});
+
+  const clearCompletedCart = () => {
+    dispatch(clearLocalCartState());
+    clearLocalCart();
+  };
 
 
 
@@ -131,10 +168,13 @@ export default function CheckoutPage() {
     if (isPhysicalProductInCart && selectedAddressId) {
         const selectedAddress = addresses.find(addr => addr._id === selectedAddressId);
         if (selectedAddress?.postalCode) {
-            dispatch(calculateShippingCost({ delivery_postcode: selectedAddress.postalCode }));
+            dispatch(calculateShippingCost({
+              delivery_postcode: selectedAddress.postalCode,
+              cod: selectedPaymentMethod === 'cod',
+            }));
         }
     }
-  }, [selectedAddressId, addresses, dispatch, isPhysicalProductInCart]);
+  }, [selectedAddressId, addresses, dispatch, isPhysicalProductInCart, selectedPaymentMethod]);
 
   useEffect(() => {
     if (isServiceInCart) {
@@ -311,7 +351,6 @@ const handleSubmitOrder = async (e: React.FormEvent) => {
       serviceInputs: isServiceInCart ? serviceInputs : undefined,
       // Only include shipping details if physical products exist
       addressId: isPhysicalProductInCart ? selectedAddressId : undefined,
-      shippingPrice: isPhysicalProductInCart ? shippingCost : 0,
     };
     
     const getSuccessUrl = (orderId: string) => `/order-success?orderId=${orderId}${isServiceInCart ? '&service_ordered=true' : ''}`;
@@ -320,6 +359,7 @@ const handleSubmitOrder = async (e: React.FormEvent) => {
     if (selectedPaymentMethod === 'cod' && !isServiceInCart) { // COD only for non-service orders
       try {
         const result = await dispatch(placeCodOrder(orderDetails)).unwrap();
+        clearCompletedCart();
         router.push(getSuccessUrl(result.order._id));
         toast({ title: "Order placed successfully!" });
       } catch (error: any) {
@@ -329,38 +369,54 @@ const handleSubmitOrder = async (e: React.FormEvent) => {
       }
     } else { // Razorpay for services or prepaid physical goods
       try {
-        const razorpayOrder = await dispatch(createRazorpayOrder({ ...orderDetails, amount: finalTotal })).unwrap();
+        if (razorpayScriptStatus !== 'ready' || !window.Razorpay) {
+          throw new Error("Payment gateway is still loading. Please try again in a moment.");
+        }
+
+        const razorpayOrder = await dispatch(createRazorpayOrder(orderDetails)).unwrap();
         const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          key: razorpayOrder.key,
           amount: razorpayOrder.amount,
-          currency: "INR",
+          currency: razorpayOrder.currency || "INR",
           name: "Vedant Gurukul Aroma",
           description: "Order Payment",
           order_id: razorpayOrder.orderId,
           handler: async (response: any) => {
             try {
               const result = await dispatch(verifyRazorpayPayment({
-                ...orderDetails,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               })).unwrap();
+              clearCompletedCart();
               router.push(getSuccessUrl(result.order._id));
               toast({ title: "Payment Successful, Order Placed!" });
             } catch (verifyError: any) {
               toast({ title: "Payment Verification Failed", description: verifyError, variant: "destructive" });
+            } finally {
+              setIsProcessing(false);
             }
           },
           prefill: { name: user?.fullName, email: user?.email, contact: user?.phone },
-          theme: { color: "#000000" }
+          theme: { color: "#000000" },
+          modal: {
+            ondismiss: () => {
+              setIsProcessing(false);
+            },
+          },
         };
-        // @ts-ignore
         const rzp = new window.Razorpay(options);
-        rzp.on('payment.failed', (response: any) => toast({ title: 'Payment Failed', description: response.error.description, variant: 'destructive' }));
+        rzp.on('payment.failed', (response: any) => {
+          setIsProcessing(false);
+          toast({
+            title: 'Payment Failed',
+            description: response.error?.description || 'Your payment could not be completed.',
+            variant: 'destructive',
+          });
+        });
         rzp.open();
       } catch (error: any) {
-        toast({ title: "Payment Initiation Failed", description: error, variant: "destructive" });
-      } finally {
+        toast({ title: "Payment Initiation Failed", description: error.message || error, variant: "destructive" });
         setIsProcessing(false);
       }
     }
@@ -526,7 +582,7 @@ const handleSubmitOrder = async (e: React.FormEvent) => {
                 {items.map((item) => (
                   <div key={item._id} className="flex items-center space-x-4">
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
-                      <Image src={item.image || "/placeholder.svg"} alt={item.product.name} fill className="object-cover" />
+                      <Image src={resolveMediaUrl(item.image)} alt={item.product.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1">
                       <h4 className="font-medium truncate">{item.product.name}</h4>
@@ -660,7 +716,7 @@ const handleSubmitOrder = async (e: React.FormEvent) => {
                 type="submit" 
                 disabled={
                   isProcessing ||
-                  (isPhysicalProductInCart && (!selectedAddressId || isShippingLoading || shippingPrice === null))
+                  (isPhysicalProductInCart && isShippingLoading)
                 }
                 className="w-full py-3 h-12 mt-6 font-semibold text-base bg-black text-white hover:bg-gray-800"
               >

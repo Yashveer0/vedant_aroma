@@ -7,6 +7,7 @@ import { fetchTaxConfig } from './taxSlice';
 import { fetchWalletConfig } from './adminSlice';
 import { getCouponByNameApi, type WalletConfig } from '@/lib/api/admin';
 import { RootState } from '../store';
+import { resolveMediaUrl, resolveMediaUrls } from '@/lib/media';
 
 // Coupon interface - matching API response exactly
 export interface Coupon {
@@ -28,6 +29,7 @@ export interface CartItem {
     slug: string;
     type?: string;
     weight?: number;
+    images?: string[];
   };
   sku_variant: string;
   quantity: number;
@@ -84,6 +86,23 @@ const initialState: CartState = {
   appliedCoupon: null, 
 };
 
+const normalizeCartItem = (item: CartItem): CartItem => {
+  const product = item.product || ({} as CartItem["product"]);
+  const productImages = resolveMediaUrls(product.images);
+
+  return {
+    ...item,
+    image: resolveMediaUrl(item.image || productImages[0]),
+    product: {
+      ...product,
+      images: productImages,
+    },
+  };
+};
+
+const normalizeCartItems = (items?: CartItem[] | null) =>
+  (items || []).map((item) => normalizeCartItem(item));
+
 // --- Async Thunks ---
 
 export const fetchCart = createAsyncThunk<CartItem[], void, { rejectValue: string }>(
@@ -91,7 +110,7 @@ export const fetchCart = createAsyncThunk<CartItem[], void, { rejectValue: strin
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get('/users/cart');
-      return response.data.data;
+      return normalizeCartItems(response.data.data);
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       return rejectWithValue(err.response?.data?.message || 'Failed to fetch cart');
@@ -104,7 +123,7 @@ export const addToCart = createAsyncThunk<CartItem[], { productId: string; sku_v
   async (params, { rejectWithValue }) => {
     try {
       const response = await apiClient.post('/users/cart', params);
-      return response.data.data;
+      return normalizeCartItems(response.data.data);
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       return rejectWithValue(err.response?.data?.message || 'Failed to add to cart');
@@ -117,7 +136,7 @@ export const removeFromCart = createAsyncThunk<CartItem[], string, { rejectValue
   async (cartItemId, { rejectWithValue }) => {
     try {
       const response = await apiClient.delete(`/users/cart/item/${cartItemId}`);
-      return response.data.data;
+      return normalizeCartItems(response.data.data);
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       return rejectWithValue(err.response?.data?.message || 'Failed to remove from cart');
@@ -130,7 +149,7 @@ export const updateCartQuantity = createAsyncThunk<CartItem[], { cartItemId: str
   async ({ cartItemId, quantity }, { rejectWithValue }) => {
     try {
       const response = await apiClient.patch(`/users/cart/item/quantity/${cartItemId}`, { quantity });
-      return response.data.data;
+      return normalizeCartItems(response.data.data);
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       return rejectWithValue(err.response?.data?.message || 'Failed to update cart quantity');
@@ -143,7 +162,7 @@ export const mergeCarts = createAsyncThunk<CartItem[], { productId: string, sku_
     async (localCartItems, { rejectWithValue }) => {
         try {
             const response = await apiClient.post('/users/cart/merge', { items: localCartItems });
-            return response.data.data;
+            return normalizeCartItems(response.data.data);
         } catch (error) {
             const err = error as AxiosError<{ message: string }>;
             return rejectWithValue(err.response?.data?.message || 'Failed to merge carts');
@@ -174,11 +193,11 @@ export const applyCoupon = createAsyncThunk<
 
 export const calculateShippingCost = createAsyncThunk<
   { shippingPrice: number | null }, // Expected return type on success
-  { delivery_postcode: string },   // Arguments passed to the thunk
+  { delivery_postcode: string; cod?: boolean },   // Arguments passed to the thunk
   { rejectValue: string; state: RootState } // Define the state type for getState
 >(
   'cart/calculateShippingCost',
-  async ({ delivery_postcode }, { getState, rejectWithValue }) => {
+  async ({ delivery_postcode, cod = false }, { getState, rejectWithValue }) => {
     try {
       // Get the current state to access the cart
       const state = getState();
@@ -196,6 +215,7 @@ export const calculateShippingCost = createAsyncThunk<
 
       const response = await apiClient.post('/shipping/serviceability', {
         delivery_postcode,
+        cod,
         weight_in_kg: weightToSend, // <<< FIXED: Send the calculated weight
       });
       return response.data.data; 
@@ -217,6 +237,11 @@ const cartSlice = createSlice({
         state.items = [];
         state.appliedPoints = 0;
         state.appliedCoupon = null;
+        state.shippingPrice = null;
+        state.shippingCost = 0;
+        state.discountAmount = 0;
+        state.couponDiscount = 0;
+        state.pointsDiscount = 0;
         cartSlice.caseReducers.calculateTotals(state);
     },
     applyPoints: (state, action: PayloadAction<number>) => {
@@ -354,4 +379,4 @@ const cartSlice = createSlice({
 
 export const { clearLocalCartState, applyPoints, removePoints, removeCoupon, calculateTotals } = cartSlice.actions;
 
-export default cartSlice.reducer;   
+export default cartSlice.reducer;

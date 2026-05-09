@@ -1,3 +1,8 @@
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const DEFAULT_API_PROXY_ORIGIN =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8000'
@@ -41,6 +46,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  outputFileTracingRoot: __dirname,
   images: {
     unoptimized: true,
     remotePatterns: uploadRemotePattern ? [uploadRemotePattern] : [],

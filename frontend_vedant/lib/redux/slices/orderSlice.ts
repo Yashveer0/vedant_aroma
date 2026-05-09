@@ -60,6 +60,10 @@ export interface Order {
   totalPrice: number;
   orderStatus: 'Pending' | 'Paid' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   paymentMethod: 'COD' | 'Razorpay';
+  paymentId?: string;
+  razorpayOrderId?: string;
+  paymentStatus?: 'pending' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
+  paidAt?: string;
   createdAt: string;
   
   // --- FIX APPLIED HERE ---
@@ -71,6 +75,11 @@ export interface Order {
     trackingNumber?: string;
     courier?: string;
     trackingUrl?: string;
+    status?: string;
+    pickupStatus?: string;
+    lastError?: string;
+    awbAssignedAt?: string;
+    pickupScheduledAt?: string;
   };
   
   cancellationDetails?: {
@@ -161,13 +170,13 @@ export const fetchSingleOrder = createAsyncThunk<Order, string, { rejectValue: s
 
 export const placeCodOrder = createAsyncThunk<
   { order: Order },
-  {couponCode?: string ,addressId: string; pointsToRedeem: number, shippingPrice: number},
+  { couponCode?: string; addressId?: string | null; pointsToRedeem?: number },
   { rejectValue: string }
 >(
   'orders/placeCodOrder',
-  async ({ addressId,couponCode ,pointsToRedeem,shippingPrice  }, { rejectWithValue }) => {
+  async ({ addressId, couponCode, pointsToRedeem }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post('/users/order/cod', { addressId, couponCode ,pointsToRedeem,shippingPrice  });
+      const response = await apiClient.post('/users/order/cod', { addressId, couponCode, pointsToRedeem });
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to place COD order');
@@ -176,8 +185,13 @@ export const placeCodOrder = createAsyncThunk<
 );
 
 export const createRazorpayOrder = createAsyncThunk<
-  { orderId: string; amount: number; key: string; addressId: string },
-  { addressId: string; amount: number, couponCode?: string  },
+  { orderId: string; amount: number; currency: string; key: string; receipt: string; checkout?: any },
+  {
+    addressId?: string | null;
+    couponCode?: string;
+    pointsToRedeem?: number;
+    serviceInputs?: Record<string, string>;
+  },
   { rejectValue: string }
 >(
   'orders/createRazorpayOrder',
@@ -194,7 +208,7 @@ export const createRazorpayOrder = createAsyncThunk<
 
 export const verifyRazorpayPayment = createAsyncThunk<
   { order: Order },
-  { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string; addressId: string, couponCode?: string; pointsToRedeem: number; serviceInputs?: Record<string, string>;   },
+  { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string },
   { rejectValue: string }
 >(
   'orders/verifyRazorpayPayment',
@@ -244,9 +258,7 @@ export const cancelOrderAsAdmin = createAsyncThunk<Order, { orderId: string; rea
   'orders/cancelOrderAsAdmin',
   async ({ orderId, reason }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.patch(`/admin/orders/${orderId}/status`, {
-        status: 'Cancelled',
-      });
+      const response = await apiClient.post(`/payment/${orderId}/cancel`, { reason });
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to cancel order');

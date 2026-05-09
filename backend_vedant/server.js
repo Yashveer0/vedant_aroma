@@ -16,15 +16,32 @@ const [{ default: connectDB }, { app }] = await Promise.all([
 ]);
 
 const PORT = Number(process.env.PORT) || 8000;
+const DB_RETRY_DELAY_MS = Number(process.env.MONGODB_RETRY_DELAY_MS) || 10000;
+const EXIT_ON_DB_FAILURE = process.env.NODE_ENV === "production";
 
 const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
 });
 
-connectDB().catch((error) => {
-  console.error("Database startup failed:", error);
-  server.close(() => process.exit(1));
-});
+const connectWithRetry = async () => {
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error("Database startup failed:", error);
+
+    if (EXIT_ON_DB_FAILURE) {
+      server.close(() => process.exit(1));
+      return;
+    }
+
+    console.error(
+      `Server is still running. Retrying MongoDB connection in ${DB_RETRY_DELAY_MS}ms...`
+    );
+    setTimeout(connectWithRetry, DB_RETRY_DELAY_MS);
+  }
+};
+
+connectWithRetry();
 
 server.on("error", (error) => {
   if (error.code === "EADDRINUSE") {

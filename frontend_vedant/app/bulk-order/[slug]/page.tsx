@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { fetchProductBySlug } from "@/lib/redux/slices/productSlice"
 import { RootState, AppDispatch } from "@/lib/redux/store"
 import { createBulkOrderInquiry } from "@/lib/redux/slices/bulkOrderSlice"
+import { resolveMediaUrl } from "@/lib/media"
 
 export default function BulkOrderPage() {
   const params = useParams()
@@ -134,7 +135,7 @@ export default function BulkOrderPage() {
             <div className="bg-white p-6 rounded-2xl border shadow-sm sticky top-24">
               <div className="relative aspect-square w-full overflow-hidden rounded-xl mb-6">
                 <Image
-                  src={product.images?.[0] || "/placeholder.svg"}
+                  src={resolveMediaUrl(product.images?.[0])}
                   alt={product.name}
                   fill
                   className="object-cover"

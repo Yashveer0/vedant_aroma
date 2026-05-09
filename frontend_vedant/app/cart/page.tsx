@@ -18,6 +18,7 @@ import { AppDispatch, RootState } from "@/lib/redux/store"
 import { selectIsAuthenticated } from "@/lib/redux/slices/authSlice"
 import { fetchCart, removeFromCart, updateCartQuantity } from "@/lib/redux/slices/cartSlice"
 import { useCart as useLocalCart } from "@/context/CartContext" // Aliased to prevent naming conflicts
+import { resolveMediaUrl } from "@/lib/media"
 
 // =================================================================
 // --- SUBCOMPONENT: Cart Item Card ---
@@ -28,7 +29,7 @@ const CartItemCard = ({ item, onUpdate, onRemove, isGuestCart }: { item: any, on
     const productDetails = isGuestCart ? item : item.product;
     const productName = productDetails?.name;
     const productSlug = productDetails?.slug;
-    const productImage = item.image || productDetails.images?.[0] || "/placeholder.svg";
+    const productImage = resolveMediaUrl(item.image || productDetails.images?.[0]);
     const productPrice = item.price;
     const productType = productDetails?.type; // <-- Get the product type
 

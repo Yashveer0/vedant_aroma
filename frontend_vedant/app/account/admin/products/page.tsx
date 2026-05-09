@@ -20,6 +20,7 @@ import { Product } from '@/lib/types/product';
 import { EditProductModal } from '@/components/EditProductModal';
 import { AddProductModal } from '@/components/AddProductModal';
 import { toast } from 'sonner';
+import { resolveMediaUrl } from '@/lib/media';
 import { Loader2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -141,7 +142,7 @@ export default function ProductsPage() {
               
               return (
                 <TableRow key={product._id}>
-                  <TableCell><Image src={product.images[0] || '/placeholder.svg'} alt={product.name} width={48} height={48} className="object-cover rounded-md" /></TableCell>
+                  <TableCell><Image src={resolveMediaUrl(product.images?.[0])} alt={product.name} width={48} height={48} className="object-cover rounded-md" /></TableCell>
                   <TableCell className="font-medium"><Tooltip><TooltipTrigger><p className="max-w-[250px] truncate">{product.name}</p></TooltipTrigger><TooltipContent><p>{product.name}</p></TooltipContent></Tooltip></TableCell>
                   <TableCell>
                     <div className="flex flex-col">

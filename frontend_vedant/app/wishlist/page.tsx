@@ -22,6 +22,7 @@ import { fetchProductById } from "@/lib/redux/slices/productSlice";
 import { useWishlist as useLocalWishlist } from "@/context/WishlistContext";
 import { useCart as useLocalCart } from "@/context/CartContext";
 import { Product } from "@/lib/types/product";
+import { resolveMediaUrls } from "@/lib/media";
 
 // --- Custom hook to fetch live product data ---
 const useLiveProductData = (productId: string) => {
@@ -70,7 +71,7 @@ const WishlistItemCard = ({ item, onRemove, onAddToCart }: { item: any, onRemove
   
   // Ensure we have required fields with fallbacks
   const productSlug = product.slug || product._id; // Fallback to _id if slug is missing
-  const productImages = product.images || ["/placeholder.svg"];
+  const productImages = resolveMediaUrls(product.images);
   const productPrice = selectedVariant ? (selectedVariant.sale_price || selectedVariant.price) : (product.price || 0);
   
   // Fix stock quantity calculation - use LIVE product data for real-time stock checking
@@ -106,7 +107,7 @@ const WishlistItemCard = ({ item, onRemove, onAddToCart }: { item: any, onRemove
     <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ type: "spring", stiffness: 300, damping: 25 }} className="bg-white rounded-md shadow-sm overflow-hidden group flex flex-col">
       <div className="relative w-full aspect-[3/4] bg-gray-50">
         <Link href={`/product/${productSlug}`}>
-          <Image src={productImages[0]} alt={product.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105"/>
+          <Image src={productImages[0] || "/placeholder.svg"} alt={product.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105"/>
         </Link>
         {discount > 0 && <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">-{discount}%</span>}
         <button onClick={() => onRemove(product._id, product.name, skuVariant)} className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Remove from wishlist">

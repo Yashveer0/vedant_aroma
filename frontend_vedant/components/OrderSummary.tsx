@@ -14,6 +14,7 @@ import { Loader2, Gift, Tag, Shield } from 'lucide-react';
 // --- Redux Imports ---
 import { RootState, AppDispatch } from '@/lib/redux/store';
 import { applyPoints, removePoints, applyCoupon, removeCoupon } from "@/lib/redux/slices/cartSlice";
+import { resolveMediaUrl } from '@/lib/media';
 
 interface OrderSummaryProps {
   isProcessing: boolean;
@@ -91,7 +92,7 @@ export function OrderSummary({ isProcessing, finalTotalForButton }: OrderSummary
         {items.map((item) => (
           <div key={item._id} className="flex items-center space-x-4">
             <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
-              <Image src={item.image || "/placeholder.svg"} alt={item.product.name} fill className="object-cover" />
+              <Image src={resolveMediaUrl(item.image)} alt={item.product.name} fill className="object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="font-medium truncate">{item.product.name}</h4>

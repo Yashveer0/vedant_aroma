@@ -34,6 +34,7 @@ import { fetchCart } from '@/lib/redux/slices/cartSlice';
 import { fetchWishlist, selectTotalWishlistItems } from '@/lib/redux/slices/wishlistSlice';
 import { clearClientAuthCookies } from '@/lib/auth/sessionCookie';
 import { logoutUserApi } from '@/lib/api/auth';
+import { resolveMediaUrl } from '@/lib/media';
 
 // --- CONTEXT ---
 import { useCart as useLocalCart } from '@/context/CartContext';
@@ -45,6 +46,7 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
+    const shopMenuRef = useRef<HTMLDivElement>(null);
     
     // --- REDUX HOOKS & STATE ---
     const dispatch = useDispatch<AppDispatch>();
@@ -65,6 +67,10 @@ const Navbar = () => {
     useOnClickOutside(searchRef, () => {
         setIsSearchOpen(false);
         setSearchQuery('');
+    });
+
+    useOnClickOutside(shopMenuRef, () => {
+        setIsShopMenuOpen(false);
     });
 
     useEffect(() => {
@@ -188,11 +194,21 @@ const Navbar = () => {
                 HOME
                 {!isMobile && <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-200 transition-all duration-300 group-hover:w-full"></span>}
             </Link>
-            <div className={`relative ${isMobile ? 'w-full' : ''}`} onMouseEnter={() => !isMobile && setIsShopMenuOpen(true)} onMouseLeave={() => !isMobile && setIsShopMenuOpen(false)}>
-                <Link href="/shop" className="flex items-center gap-1 hover:text-green-200 transition-colors relative group">
-                    SHOP <ChevronDown size={16} className="transition-transform group-hover:rotate-180 duration-300" />
+            <div ref={shopMenuRef} className={`relative ${isMobile ? 'w-full' : ''}`}>
+                <button
+                    type="button"
+                    className="flex items-center gap-1 hover:text-green-200 transition-colors relative group"
+                    onClick={() => {
+                        if (!isMobile) {
+                            setIsShopMenuOpen((isOpen) => !isOpen);
+                        }
+                    }}
+                    aria-haspopup={!isMobile ? "menu" : undefined}
+                    aria-expanded={!isMobile ? isShopMenuOpen : undefined}
+                >
+                    SHOP <ChevronDown size={16} className={`transition-transform duration-300 ${isShopMenuOpen ? 'rotate-180' : ''}`} />
                     {!isMobile && <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-200 transition-all duration-300 group-hover:w-full"></span>}
-                </Link>
+                </button>
                 {!isMobile && (
                     <AnimatePresence>
                         {isShopMenuOpen && (
@@ -318,7 +334,7 @@ const Navbar = () => {
                                                                         }}
                                                                         className="flex items-center gap-3 p-3 hover:bg-green-50 transition-colors"
                                                                     >
-                                                                        <Image src={p.images[0]} alt={p.name} width={40} height={40} quality={30} className="rounded object-cover" />
+                                                                        <Image src={resolveMediaUrl(p.images?.[0])} alt={p.name} width={40} height={40} quality={30} className="rounded object-cover" />
                                                                         <span className="text-sm font-medium text-gray-800">{p.name}</span>
                                                                     </Link>
                                                                 </li>
@@ -412,7 +428,7 @@ const Navbar = () => {
                                                                         onClick={() => setSearchQuery('')}
                                                                         className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors"
                                                                     >
-                                                                        <Image src={p.images[0]} alt={p.name} width={40} height={40} quality={30} className="rounded object-cover" />
+                                                                        <Image src={resolveMediaUrl(p.images?.[0])} alt={p.name} width={40} height={40} quality={30} className="rounded object-cover" />
                                                                         <span className="text-sm font-medium text-gray-800">{p.name}</span>
                                                                     </Link>
                                                                 </SheetClose>

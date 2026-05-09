@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-label="Product image placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7f2e8"/>
+      <stop offset="1" stop-color="#e7efe8"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <rect x="72" y="92" width="456" height="616" rx="28" fill="#ffffff" opacity=".72"/>
+  <circle cx="300" cy="315" r="92" fill="#d8c48f" opacity=".55"/>
+  <path d="M186 498c46-78 88-117 126-117 30 0 54 23 80 58 18 24 35 44 63 59v74H145v-38c14-8 27-20 41-36Z" fill="#3aa66f" opacity=".78"/>
+  <path d="M297 244c-23 42-74 74-74 121 0 47 35 83 77 83s77-36 77-83c0-47-55-79-80-121Z" fill="#0f9f67"/>
+  <path d="M300 322c-19 24-37 43-37 67 0 22 16 38 37 38 20 0 37-16 37-38 0-24-18-43-37-67Z" fill="#f6f0df"/>
+  <text x="300" y="652" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#1f2937">Vedant Gurukul</text>
+  <text x="300" y="690" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#667085">Product image coming soon</text>
+</svg>
