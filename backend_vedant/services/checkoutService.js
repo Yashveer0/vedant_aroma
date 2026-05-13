@@ -208,22 +208,16 @@ export const buildCheckoutQuote = async ({
 
   let walletDiscount = 0;
   let rupeesPerPoint = 1;
+  let appliedPoints = 0;
   if (pointsToApply > 0) {
-    if (pointsToApply > Number(user.wallet || 0)) {
-      throw new ApiError(400, "You do not have enough points in your wallet.");
-    }
-
     const walletConfigQuery = WalletConfig.findOne();
     if (session) walletConfigQuery.session(session);
     const walletConfig = await walletConfigQuery;
     rupeesPerPoint = toPositiveNumber(walletConfig?.rupeesPerPoint, 1);
 
     const maxRedeemablePoints = Math.floor(discountableAmount / rupeesPerPoint);
-    if (pointsToApply > maxRedeemablePoints) {
-      throw new ApiError(400, `You can redeem up to ${maxRedeemablePoints} points on this order.`);
-    }
-
-    walletDiscount = roundCurrency(pointsToApply * rupeesPerPoint);
+    appliedPoints = Math.min(pointsToApply, Number(user.wallet || 0), maxRedeemablePoints);
+    walletDiscount = roundCurrency(appliedPoints * rupeesPerPoint);
   }
 
   const taxConfigQuery = TaxConfig.findOne().lean();
@@ -247,7 +241,7 @@ export const buildCheckoutQuote = async ({
       discountAmount,
       couponCode: validatedCouponCode,
       totalPrice,
-      pointsToRedeem: pointsToApply,
+      pointsToRedeem: appliedPoints,
       paymentMethod: normalizedPaymentMethod,
       containsPhysicalProduct,
       containsService,

@@ -103,6 +103,8 @@ const normalizeCartItem = (item: CartItem): CartItem => {
 const normalizeCartItems = (items?: CartItem[] | null) =>
   (items || []).map((item) => normalizeCartItem(item));
 
+const roundCurrency = (value: number) => Math.round((Number(value) || 0) * 100) / 100;
+
 // --- Async Thunks ---
 
 export const fetchCart = createAsyncThunk<CartItem[], void, { rejectValue: string }>(
@@ -257,35 +259,34 @@ const cartSlice = createSlice({
       cartSlice.caseReducers.calculateTotals(state);
     },
     calculateTotals: (state) => {
-      const subTotal = state.items.reduce((total, item) => total + item.price * item.quantity, 0);
+      const subTotal = roundCurrency(state.items.reduce((total, item) => total + item.price * item.quantity, 0));
       const totalItems = state.items.reduce((total, item) => total + item.quantity, 0);
 
-      // 1. Calculate coupon discount from subtotal
       let couponDiscount = 0;
       if (state.appliedCoupon) {
-        couponDiscount = (subTotal * state.appliedCoupon.discountPercentage) / 100;
+        couponDiscount = Math.min(
+          subTotal,
+          roundCurrency((subTotal * Number(state.appliedCoupon.discountPercentage || 0)) / 100)
+        );
       }
 
-      // 2. Calculate points discount based on applied points and conversion rate
-      const pointsDiscount = state.appliedPoints * state.rupeesPerPoint;
+      const rupeesPerPoint = Number(state.rupeesPerPoint || 1) > 0 ? Number(state.rupeesPerPoint || 1) : 1;
+      const maxPointsDiscount = Math.max(0, roundCurrency(subTotal - couponDiscount));
+      const maxRedeemablePoints = Math.floor(maxPointsDiscount / rupeesPerPoint);
+      const effectiveAppliedPoints = Math.min(Number(state.appliedPoints || 0), maxRedeemablePoints);
+      state.appliedPoints = effectiveAppliedPoints;
 
-      // 3. Sum of all discounts
-      const totalDiscount = couponDiscount + pointsDiscount;
+      const pointsDiscount = roundCurrency(effectiveAppliedPoints * rupeesPerPoint);
+      const totalDiscount = roundCurrency(couponDiscount + pointsDiscount);
 
-      // 4. Calculate the base for tax (subtotal after all discounts)
-      const taxableAmount = Math.max(0, subTotal - totalDiscount);
+      const taxableAmount = Math.max(0, roundCurrency(subTotal - totalDiscount));
       
-      // 5. Calculate tax
       const taxAmount = 0;
       
-      // 6. Set shipping cost (can be made dynamic later)
-      // const shippingCost = 90;
       const shippingCost = state.shippingPrice || 0;
       
-      // 7. Calculate the final payable amount
-      const finalTotal = taxableAmount + shippingCost + taxAmount;
+      const finalTotal = roundCurrency(taxableAmount + shippingCost + taxAmount);
 
-      // 8. Update the entire state
       state.subTotal = subTotal;
       state.totalItems = totalItems;
       state.couponDiscount = couponDiscount;

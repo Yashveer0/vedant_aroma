@@ -44,6 +44,17 @@ const paymentSessionSchema = new mongoose.Schema(
     failureReason: {
       type: String,
     },
+    razorpayWebhookEventIds: [
+      {
+        type: String,
+      },
+    ],
+    lastWebhookEvent: {
+      type: String,
+    },
+    lastWebhookReceivedAt: {
+      type: Date,
+    },
     expiresAt: {
       type: Date,
     },

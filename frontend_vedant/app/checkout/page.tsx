@@ -108,7 +108,7 @@ export default function CheckoutPage() {
   
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cod' | 'razorpay'>('cod');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'cod' | 'razorpay'>('razorpay');
   const [isProcessing, setIsProcessing] = useState(false);
   const [pointsInput, setPointsInput] = useState("");
   const [isApplyingPoints, setIsApplyingPoints] = useState(false);
@@ -177,12 +177,10 @@ export default function CheckoutPage() {
   }, [selectedAddressId, addresses, dispatch, isPhysicalProductInCart, selectedPaymentMethod]);
 
   useEffect(() => {
-    if (isServiceInCart) {
+    if (isServiceInCart && selectedPaymentMethod === 'cod') {
       setSelectedPaymentMethod('razorpay');
-    } else {
-      setSelectedPaymentMethod('cod');
     }
-  }, [isServiceInCart]);
+  }, [isServiceInCart, selectedPaymentMethod]);
 
   // Redirect if cart is empty after loading
   useEffect(() => {
@@ -243,29 +241,35 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Calculate maximum points that can be applied based on wallet settings
-    const maxPointsValue = walletSettings ? subTotal : subTotal;
-    const maxPointsToApply = walletSettings ? Math.floor(maxPointsValue / walletSettings.rupeesPerPoint) : subTotal;
+    const couponValue = appliedCoupon ? (subTotal * Number(appliedCoupon.discountPercentage || 0)) / 100 : 0;
+    const maxPointsValue = Math.max(0, subTotal - couponValue);
+    const rupeesPerPointValue = walletSettings?.rupeesPerPoint || rupeesPerPoint || 1;
+    const maxPointsToApply = Math.floor(maxPointsValue / rupeesPerPointValue);
     
-    if (pointsToApply > maxPointsToApply) {
+    if (maxPointsToApply <= 0) {
       toast({
-        title: "Points Exceed Limit",
-        description: `You can only apply up to ${maxPointsToApply} points (₹${maxPointsValue}).`,
+        title: "Points Not Applicable",
+        description: "This coupon already covers the redeemable product value.",
         variant: "destructive"
       });
       return;
     }
 
+    const pointsToRedeem = Math.min(pointsToApply, maxPointsToApply);
+
     setIsApplyingPoints(true);
     try {
-      dispatch(applyPoints(pointsToApply));
+      dispatch(applyPoints(pointsToRedeem));
       setPointsInput("");
       
-      const discountAmount = walletSettings ? pointsToApply * walletSettings.rupeesPerPoint : pointsToApply;
+      const discountAmount = pointsToRedeem * rupeesPerPointValue;
       
       toast({
         title: "Points Applied",
-        description: `${pointsToApply} points (₹${discountAmount}) applied to your order.`,
+        description:
+          pointsToRedeem < pointsToApply
+            ? `${pointsToRedeem} points applied after coupon discount.`
+            : `${pointsToRedeem} points (Rs ${discountAmount}) applied to your order.`,
       });
     } finally {
       setIsApplyingPoints(false);
@@ -558,15 +562,15 @@ const handleSubmitOrder = async (e: React.FormEvent) => {
                 </h2>
                 <div className="space-y-4">
 
-                  {/* 3. Conditionally render the COD option */}
+                  <div onClick={() => setSelectedPaymentMethod('razorpay')} className={`flex items-center space-x-3 p-4 border rounded-xl cursor-pointer transition-all ${selectedPaymentMethod === 'razorpay' ? 'border-black ring-2 ring-black bg-gray-50' : 'border-gray-200 hover:border-gray-400'}`}>
+                    <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">R</div><span className="flex-1 font-medium">Pay Online (Razorpay)</span>{selectedPaymentMethod === 'razorpay' && <CheckCircle className="h-5 w-5 text-black" />}
+                  </div>
+
                   {!isServiceInCart && (
                     <div onClick={() => setSelectedPaymentMethod('cod')} className={`flex items-center space-x-3 p-4 border rounded-xl cursor-pointer transition-all ${selectedPaymentMethod === 'cod' ? 'border-black ring-2 ring-black bg-gray-50' : 'border-gray-200 hover:border-gray-400'}`}>
                       <CreditCard className="h-5 w-5 text-gray-500" /><span className="flex-1 font-medium">Cash on Delivery (COD)</span>{selectedPaymentMethod === 'cod' && <CheckCircle className="h-5 w-5 text-black" />}
                     </div>
                   )}
-                  <div onClick={() => setSelectedPaymentMethod('razorpay')} className={`flex items-center space-x-3 p-4 border rounded-xl cursor-pointer transition-all ${selectedPaymentMethod === 'razorpay' ? 'border-black ring-2 ring-black bg-gray-50' : 'border-gray-200 hover:border-gray-400'}`}>
-                    <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">R</div><span className="flex-1 font-medium">Pay Online (Razorpay)</span>{selectedPaymentMethod === 'razorpay' && <CheckCircle className="h-5 w-5 text-black" />}
-                  </div>
                 </div>
               </div>
             </div>

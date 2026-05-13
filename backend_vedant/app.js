@@ -40,6 +40,7 @@ app.options(
   })
 );
 
+app.use("/api/v1/payment/webhook", express.raw({ type: "application/json", limit: "2mb" }));
 app.use(express.json({ limit: "500mb" }));
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use(cookieParser());

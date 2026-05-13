@@ -4,12 +4,15 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import {
   createRazorpayOrder,
+  handleRazorpayWebhook,
   verifyPaymentAndPlaceOrder,
   cancelOrder,
   // getSingleOrderDetails,
 } from "../controllers/payment.controller.js";
 
 const router = Router();
+
+router.route("/webhook").post(handleRazorpayWebhook);
 
 router.use(authMiddleware);
 
