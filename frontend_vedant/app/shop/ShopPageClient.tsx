@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import ProductGridSkeleton from '@/components/skeleton/ProductGridSkeleton';
 import { resolveMediaUrls } from '@/lib/media';
+import { getCatalogCategoryDisplayName, isCatalogCategoryVisible } from '@/lib/catalogCompliance';
 
 const MAX_PRICE = 8000;
 
@@ -30,20 +31,14 @@ export default function ShopPageClient() {
 
   const { items: products, loading, error, currentPage, totalPages, totalProducts } = useSelector((state: RootState) => state.product);
   const { categories, subcategories, categoryStatus, subcategoryStatus } = useSelector((state: RootState) => state.admin);
+  const visibleCategories = useMemo(
+    () => categories.filter((cat) => isCatalogCategoryVisible(cat.name)),
+    [categories]
+  );
 
   // --- DYNAMICALLY GENERATED FILTERS ---
   const allFilterGroups = useMemo(() => {
     const dynamicFilters = [];
-
-    // --- UPDATED: Added Type Filter ---
-    dynamicFilters.push({
-      id: 'type',
-      label: 'Type',
-      options: [
-        { id: 'product', label: 'Product' },
-        { id: 'service', label: 'Service' },
-      ],
-    });
 
     // --- Price Filter ---
     // dynamicFilters.push({
@@ -52,11 +47,11 @@ export default function ShopPageClient() {
     //   options: [], // No options needed for price range slider
     // });
 
-    if (categories.length > 0) {
+    if (visibleCategories.length > 0) {
       dynamicFilters.push({
         id: 'category',
         label: 'Category',
-        options: categories.map(cat => ({ id: cat.name, label: cat.name })),
+        options: visibleCategories.map(cat => ({ id: cat.name, label: getCatalogCategoryDisplayName(cat.name) })),
       });
     }
 
@@ -70,7 +65,7 @@ export default function ShopPageClient() {
     }
 
     return dynamicFilters;
-  }, [categories, subcategories]);
+  }, [visibleCategories, subcategories]);
 
   // --- STATE INITIALIZATION FROM URL ---
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>(() => {
@@ -147,7 +142,7 @@ export default function ShopPageClient() {
       
       const updatedFilters = { ...prev, [groupId]: newGroupFilters };
 
-      // --- This logic is specific to your clothing/decorative categories and can remain as is ---
+      // Reset dependent filters when category changes.
       if (groupId === 'category') {
         allFilterGroups.forEach(group => {
           if (group.isClothing) delete updatedFilters[group.id];
@@ -197,7 +192,7 @@ export default function ShopPageClient() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-gray-100 rounded-2xl p-8 text-center mb-12">
           <h1 className="text-4xl font-serif font-bold">Shop Collection</h1>
-          <p className="text-gray-600 mt-2">Discover our curated selection of clothing and decorative items.</p>
+          <p className="text-gray-600 mt-2">Discover our curated selection of aroma oils and ritual blends.</p>
         </div>
         <div className="flex flex-col lg:flex-row gap-8">
           <FiltersSidebar 

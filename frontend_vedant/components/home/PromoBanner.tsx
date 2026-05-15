@@ -44,7 +44,7 @@ export function PromoBanner() {
                         {/* Heading */}
                         <div className="space-y-3">
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[var(--card-text)] leading-tight">
-                                Pure Healing
+                                Pure Aroma
                                 <span className="block text-[var(--text-primary)]">
                                     Oils Collection
                                 </span>
@@ -59,7 +59,7 @@ export function PromoBanner() {
 
                         {/* Description */}
                         <p className="text-base md:text-lg text-[var(--text-secondary)] leading-relaxed max-w-lg">
-                            Experience the ancient wisdom of Ayurveda with our carefully crafted healing oils. Each blend is formulated using traditional Vedic knowledge to promote balance, wellness, and inner peace.
+                            Explore carefully crafted aroma oils made for daily rituals, meditation, and positive spaces. Each blend is prepared with a focus on fragrance, purity, and consistent quality.
                         </p>
 
                         {/* Features List */}
@@ -70,7 +70,7 @@ export function PromoBanner() {
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                                 <div className="h-2 w-2 bg-[var(--text-primary)] rounded-full"></div>
-                                <span className="text-[var(--card-text)] font-medium">Vedic Formulas</span>
+                                <span className="text-[var(--card-text)] font-medium">Ritual Blends</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                                 <div className="h-2 w-2 bg-[var(--text-primary)] rounded-full"></div>
@@ -119,7 +119,7 @@ export function PromoBanner() {
                                 {/* Product Image - Replace with your actual product image */}
                                 <Image
                                     src="/promopng.png"
-                                    alt="Healing Oils Collection"
+                                    alt="Aroma Oils Collection"
                                     fill
                                     className="object-contain drop-shadow-2xl relative z-10"
                                 />
@@ -141,7 +141,7 @@ export function PromoBanner() {
                                 </div>
                                 <div>
                                     <p className="text-xs text-[var(--text-secondary)]">Certified</p>
-                                    <p className="text-sm font-bold text-[var(--card-text)]">Organic</p>
+                                    <p className="text-sm font-bold text-[var(--card-text)]">Quality Checked</p>
                                 </div>
                             </div>
                         </div>

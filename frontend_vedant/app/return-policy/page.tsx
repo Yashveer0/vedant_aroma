@@ -2,24 +2,26 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { 
-  CalendarDays, 
-  CheckCircle2, 
-  XCircle, 
-  CornerUpLeft, 
+import {
+  CalendarDays,
+  CheckCircle2,
+  XCircle,
+  CornerUpLeft,
   Search,
-  PackageCheck 
+  PackageCheck,
 } from "lucide-react";
 import { ReactNode } from "react";
 
-// Reusable component for each policy section (Themed)
+const supportEmail = "vedant.gurukul7@gmail.com";
+const supportPhone = "+91 79917 49998, +91 82998 54442";
+
 const PolicySection = ({
   id,
   icon: Icon,
   title,
   children,
 }: {
-  id:string;
+  id: string;
   icon: React.ElementType;
   title: string;
   children: ReactNode;
@@ -38,9 +40,9 @@ export default function ReturnPolicyPage() {
   const sections = [
     { id: "our-promise", title: "Our Commitment" },
     { id: "return-window", title: "Return Window" },
-    { id: "eligibility", title: "Conditions for Return" },
-    { id: "non-returnable", title: "Exemptions & Special Cases" },
-    { id: "initiate-return", title: "How to Start a Return" },
+    { id: "eligibility", title: "Conditions" },
+    { id: "non-returnable", title: "Non-Returnable" },
+    { id: "initiate-return", title: "Start a Return" },
     { id: "inspection", title: "Inspection & Refund" },
   ];
 
@@ -48,29 +50,24 @@ export default function ReturnPolicyPage() {
     <div className="min-h-screen bg-[var(--base-10)]">
       <Navbar />
       <main className="container mx-auto max-w-5xl px-4 py-12 md:py-20">
-        
-        {/* --- Header rewritten for Vedant Gurukul Aroma brand --- */}
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-bold text-[var(--pallete-500)] md:text-5xl font-serif">
-            Return & Exchange Policy
+            Return Policy
           </h1>
           <p className="mt-4 text-lg text-gray-600">
-            Your trust in our purity and authenticity is paramount.
+            Conditions and steps for returning eligible aroma oil orders.
           </p>
+          <p className="mt-2 text-sm text-gray-500">Last Updated: 15 May 2026</p>
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
-          {/* --- Sticky navigation (themed) --- */}
           <aside className="lg:col-span-1 lg:sticky lg:top-24 h-fit">
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-gray-800">Quick Navigation</h3>
               <ul className="mt-4 space-y-2">
                 {sections.map((section) => (
                   <li key={section.id}>
-                    <a
-                      href={`#${section.id}`}
-                      className="text-gray-600 transition-colors hover:text-primary hover:underline"
-                    >
+                    <a href={`#${section.id}`} className="text-gray-600 transition-colors hover:text-primary hover:underline">
                       {section.title}
                     </a>
                   </li>
@@ -79,45 +76,55 @@ export default function ReturnPolicyPage() {
             </div>
           </aside>
 
-          {/* --- Main content area with updated policies for Vedant Gurukul --- */}
           <div className="lg:col-span-2">
             <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm md:p-12">
-
-              <PolicySection id="our-promise" icon={PackageCheck} title="1. Our Commitment to You">
-                <p>At Vedant Gurukul, your satisfaction and holistic well-being are our top priorities. We stand behind the authenticity and quality of our aroma oils and wellness products. If you are not completely satisfied with your purchase, we are here to help, subject to the terms below.</p>
+              <PolicySection id="our-promise" icon={PackageCheck} title="1. Our Commitment">
+                <p>
+                  We pack and ship aroma oils with care. If you receive a damaged, incorrect, or eligible unopened product, we will help with a return, replacement, or refund as per the terms below.
+                </p>
               </PolicySection>
-              
+
               <PolicySection id="return-window" icon={CalendarDays} title="2. Return Window">
-                <p>To ensure the purity and integrity of our products, we offer a <strong>7-day return policy</strong>. Please initiate your return request within 7 days from the date of delivery. Any requests made after this period will not be eligible for a return.</p>
+                <p>
+                  Return requests must be raised within <strong>7 days from the date of delivery</strong>. Requests raised after 7 days are not eligible for return unless required by applicable law.
+                </p>
               </PolicySection>
 
               <PolicySection id="eligibility" icon={CheckCircle2} title="3. Conditions for a Valid Return">
-                <p>For a return to be accepted, the product must be in its original condition. This means:</p>
+                <p>For a return to be accepted, the product must meet all of the following conditions:</p>
                 <ul>
-                  <li>The item must be <strong>unopened, unused, and in its original sealed packaging.</strong></li>
-                  <li>The product’s seal and any tamper-evident labels must be fully intact.</li>
-                  <li>It must be returned with all original boxing, manuals, and accessories.</li>
+                  <li>The product is unopened, unused, and in original sealed packaging.</li>
+                  <li>All labels, tamper-evident seals, invoices, accessories, and original box/packing are intact.</li>
+                  <li>The product is not damaged after delivery due to misuse, improper storage, or handling by the customer.</li>
+                  <li>The return is approved by our support team after reviewing the request details.</li>
                 </ul>
               </PolicySection>
 
-              <PolicySection id="non-returnable" icon={XCircle} title="4. Exemptions & Special Cases">
-                <p>Due to the nature of our products and services, the following are non-returnable:</p>
+              <PolicySection id="non-returnable" icon={XCircle} title="4. Non-Returnable Items & Cases">
                 <ul>
-                  <li>Any product that has been opened, used, or has a broken seal.</li>
-                  <li><strong>Services:</strong> All Astrology, Vastu, Healing, or other consultation services are non-refundable once they have been rendered.</li>
-                  <li>Products marked as "Final Sale" or purchased from a clearance section.</li>
-                  <li>Gift cards.</li>
+                  <li>Opened, used, or partially consumed products.</li>
+                  <li>Products with broken seals, missing labels, missing invoice, or damaged original packaging.</li>
+                  <li>Items marked final sale, clearance, or gift cards where applicable.</li>
+                  <li>Returns raised after the 7-day return window.</li>
+                  <li>Damage or shortage reported after 48 hours of delivery.</li>
                 </ul>
-                <h4 className="font-semibold mt-4">What if my item is damaged or incorrect?</h4>
-                <p>If you receive a damaged, defective, or incorrect item, please contact our support team within <strong>48 hours</strong> of delivery with a photo of the product. We will gladly arrange for a replacement or a full refund at no cost to you.</p>
+                <h4 className="font-semibold mt-4">Damaged, defective, or incorrect item</h4>
+                <p>
+                  If your order arrives damaged, defective, missing, or incorrect, contact us within <strong>48 hours of delivery</strong> with your Order ID and clear photos/video of the package and item.
+                </p>
               </PolicySection>
-              
+
               <PolicySection id="initiate-return" icon={CornerUpLeft} title="5. How to Start a Return">
-                <p>To begin the return process, please email our customer care team at <a href="mailto:support@vedantgurukul.com" className="text-primary underline">support@vedantgurukul.com</a>. Be sure to include your <strong>Order ID</strong> and the reason for the return. Our team will guide you through the next steps and arrange for a reverse pickup where possible.</p>
+                <p>Send your return request with Order ID, reason, photos/video where applicable, and contact details.</p>
+                <p><strong>Email:</strong> <a href={`mailto:${supportEmail}`} className="text-primary underline">{supportEmail}</a></p>
+                <p><strong>Phone:</strong> {supportPhone}</p>
+                <p>Our team will review the request and share next steps. Reverse pickup is subject to courier serviceability. If reverse pickup is not available, we may ask you to ship the item to our return address.</p>
               </PolicySection>
 
               <PolicySection id="inspection" icon={Search} title="6. Inspection & Refund">
-                <p>Once your returned item reaches our facility, it will undergo a quality inspection. If the return is approved, we will notify you and process your refund as per our <a href="/refund-policy" className="text-primary underline">Refund Policy</a>. Vedant Gurukul reserves the right to reject any return that does not meet the above conditions.</p>
+                <p>
+                  Once the returned product reaches us, it will be inspected. If approved, replacement or refund will be processed as per our <a href="/refund-policy" className="text-primary underline">Refund Policy</a>. We may reject a return if the product does not meet the conditions above.
+                </p>
               </PolicySection>
             </div>
           </div>

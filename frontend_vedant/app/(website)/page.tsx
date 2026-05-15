@@ -4,14 +4,11 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import HomePageSkeleton from "@/components/skeleton/HomePageSkeleton";
-import { HeroSection } from "@/components/home/HeroSection";
 import { ProductSection } from "@/components/home/ProductSection";
 import { CategoryScroller } from "@/components/home/CategoryScroller";
 import { PromoBanner } from "@/components/home/PromoBanner";
-import { BrandLogos } from "@/components/home/BrandLogos";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { ContactForm } from "@/components/home/ContactForm";
-import { StyleYourSpace } from "@/components/home/StyleYourSpace";
 import HeroSlider from "@/components/home/HeroSlider";
 import { AboutSection } from "@/components/home/AboutSection";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
@@ -73,15 +70,11 @@ const HomePage = () => {
         />
 
         <PromoBanner />
-        <ProductSection
-          title="Explore Our Premium services"
-          queryParams={{ type:"service", limit: 4 }}
-        />
         <AboutSection />
         
         {/* Thematic section based on your categories */}
         <ProductSection
-            title="Yoga & Healing Essentials"
+            title="Yoga & Meditation Oils"
             queryParams={{ category: "Yoga & Healing Oils", limit: 4 }}
         />
 

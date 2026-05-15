@@ -35,6 +35,7 @@ import { fetchWishlist, selectTotalWishlistItems } from '@/lib/redux/slices/wish
 import { clearClientAuthCookies } from '@/lib/auth/sessionCookie';
 import { logoutUserApi } from '@/lib/api/auth';
 import { resolveMediaUrl } from '@/lib/media';
+import { getCatalogCategoryDisplayName, isCatalogCategoryVisible } from '@/lib/catalogCompliance';
 
 // --- CONTEXT ---
 import { useCart as useLocalCart } from '@/context/CartContext';
@@ -114,16 +115,16 @@ const Navbar = () => {
         router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
     };
 
-    const shopMenuItems = categories.map(category => ({
+    const shopMenuItems = categories.filter(category => isCatalogCategoryVisible(category.name)).map(category => ({
         name: category.name,
+        label: getCatalogCategoryDisplayName(category.name),
         href: `/shop?category=${encodeURIComponent(category.name)}`,
-        icon: "🌿"
     }));
 
     shopMenuItems.push({
         name: "All Products",
+        label: "All Products",
         href: "/shop",
-        icon: "🛍️"
     });
 
     const dropdownVariants = {
@@ -216,8 +217,8 @@ const Navbar = () => {
                                 <div className="p-3">
                                     {shopMenuItems.map(item => (
                                         <Link key={item.name} href={item.href} className="flex items-center gap-3 px-4 py-3 text-[var(--card-text)] rounded-xl hover:bg-green-50 hover:text-[var(--text-primary)] transition-all duration-200 group" onClick={() => setIsShopMenuOpen(false)}>
-                                            <span className="text-xl group-hover:scale-110 transition-transform duration-200">{item.icon}</span>
-                                            <span className="font-medium">{item.name}</span>
+                                            <Leaf className="h-4 w-4 text-[var(--text-primary)] group-hover:scale-110 transition-transform duration-200" />
+                                            <span className="font-medium">{item.label}</span>
                                         </Link>
                                     ))}
                                 </div>
@@ -231,8 +232,8 @@ const Navbar = () => {
                         {shopMenuItems.map(item => (
                             <SheetClose asChild key={item.name}>
                                 <Link href={item.href} className="flex items-center gap-3 px-4 py-2 text-white/90 hover:text-white transition-colors">
-                                    <span className="text-lg">{item.icon}</span>
-                                    <span>{item.name}</span>
+                                    <Leaf className="h-4 w-4" />
+                                    <span>{item.label}</span>
                                 </Link>
                             </SheetClose>
                         ))}
@@ -241,10 +242,6 @@ const Navbar = () => {
             </div>
             <Link href="/about-us" className="hover:text-green-200 transition-colors relative group" onClick={() => setIsMobileMenuOpen(false)}>
                 ABOUT US
-                {!isMobile && <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-200 transition-all duration-300 group-hover:w-full"></span>}
-            </Link>
-            <Link href="/shop?type=service" className="hover:text-green-200 transition-colors relative group" onClick={() => setIsMobileMenuOpen(false)}>
-                SERVICES
                 {!isMobile && <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-200 transition-all duration-300 group-hover:w-full"></span>}
             </Link>
             <Link href="/shop/best-sellers" className="hover:text-green-200 transition-colors relative group" onClick={() => setIsMobileMenuOpen(false)}>
@@ -456,7 +453,7 @@ const Navbar = () => {
 
                                     <NavLinks isMobile={true} />
                                     <div className="mt-12 pt-8 border-t border-white/20">
-                                        <p className="text-sm text-green-100 italic text-center">Pure • Natural • Authentic</p>
+                                        <p className="text-sm text-green-100 italic text-center">Pure | Natural | Authentic</p>
                                     </div>
                                 </SheetContent>
                             </Sheet>

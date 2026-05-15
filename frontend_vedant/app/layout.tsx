@@ -25,9 +25,9 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: "Vedant Aroma",
+  title: "Vedant Gurukul Aroma Mart",
   description:
-    "",
+    "Aroma oils and ritual blends for Vastu, astrology, meditation, and daily practices.",
   generator: "v0.app",
 }
 

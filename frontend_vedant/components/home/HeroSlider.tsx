@@ -10,7 +10,7 @@ const slides = [
     {
         image: '/images/slider-1.jpg',
         title: "A Legacy of Vedic Wisdom",
-        subtitle: "Vedant Gurukul started its journey in 2019, extending Vedic services to train professionals in Astrology, Vastu, Yoga, and Ayurveda. We now bring you the authentic Aroma Blends used in these sacred domains.",
+        subtitle: "Vedant Gurukul started its journey in 2019 and now brings authentic aroma oil blends inspired by Vastu, Astrology, Yoga, and traditional ritual practices.",
         buttonText: "Our Story",
         buttonLink: "/about-us"
     },
@@ -24,16 +24,9 @@ const slides = [
     {
         image: '/images/slider-3.jpg',
         title: "Wellness for Mind, Body & Soul",
-        subtitle: "Elevate your daily practice and find inner peace with our specially formulated Yoga & Healing Oils.",
-        buttonText: "Healing Oils",
+        subtitle: "Elevate your daily practice with carefully blended Yoga & Meditation Oils.",
+        buttonText: "Meditation Oils",
         buttonLink: "/shop?category=Yoga+%26+Healing+Oils"
-    },
-    {
-        image: '/images/slider-4.jpg',
-        title: "The Essence of Ayurveda",
-        subtitle: "Discover the potent, pure, and time-tested formulations of our Aroma Medicines and Aark Ayurveda collections.",
-        buttonText: "Ayurveda Collection",
-        buttonLink: "/shop?category=Aark+Ayurveda"
     },
     {
         image: '/images/slider-5.jpg',
@@ -155,7 +148,7 @@ const HeroSlider = () => {
                             className="mt-8 flex items-center gap-2 text-green-200 text-sm"
                         >
                             <div className="h-px w-12 bg-green-300/50"></div>
-                            <span className="font-light italic">Pure • Natural • Authentic</span>
+                            <span className="font-light italic">Pure | Natural | Authentic</span>
                         </motion.div>
                     </div>
                 </motion.div>

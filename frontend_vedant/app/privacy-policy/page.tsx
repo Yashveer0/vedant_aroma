@@ -2,19 +2,22 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { 
-  ClipboardList, 
-  Settings, 
-  Share2, 
-  Shield, 
-  Cookie, 
-  UserCheck, 
-  FileClock, 
-  Mail 
+import {
+  ClipboardList,
+  Settings,
+  Share2,
+  Shield,
+  Cookie,
+  UserCheck,
+  FileClock,
+  Mail,
 } from "lucide-react";
 import { ReactNode } from "react";
 
-// Reusable component for each policy section
+const supportEmail = "vedant.gurukul7@gmail.com";
+const supportPhone = "+91 79917 49998, +91 82998 54442";
+const businessAddress = "K-911, Sector-K, Ashiyana, Kanpur Road, Lucknow, Uttar Pradesh 226012";
+
 const PolicySection = ({
   id,
   icon: Icon,
@@ -39,12 +42,12 @@ const PolicySection = ({
 export default function PrivacyPolicyPage() {
   const sections = [
     { id: "info-collected", title: "Information We Collect" },
-    { id: "info-use", title: "How We Use Your Information" },
-    { id: "info-sharing", title: "Sharing Your Information" },
-    { id: "info-security", title: "Data Security" },
-    { id: "cookies", title: "Cookies & Tracking Technologies" },
-    { id: "your-rights", title: "Your Rights & Control" },
-    { id: "policy-changes", title: "Policy Updates" },
+    { id: "info-use", title: "How We Use Information" },
+    { id: "payments", title: "Payments & Razorpay" },
+    { id: "info-sharing", title: "Information Sharing" },
+    { id: "info-security", title: "Security & Retention" },
+    { id: "cookies", title: "Cookies" },
+    { id: "your-rights", title: "Your Rights" },
     { id: "contact-us", title: "Contact Us" },
   ];
 
@@ -52,32 +55,24 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-[var(--base-10)]">
       <Navbar />
       <main className="container mx-auto max-w-5xl px-4 py-12 md:py-20">
-        
-        {/* --- Header rewritten for Vedant Gurukul Aroma brand --- */}
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-bold text-[var(--pallete-500)] md:text-5xl font-serif">
             Privacy Policy
           </h1>
           <p className="mt-4 text-lg text-gray-600">
-            Your trust is a sacred bond. Here’s how we honor and protect your privacy.
+            How Vedant Gurukul Aroma Mart collects, uses, protects, and shares customer information.
           </p>
-          {/* <p className="mt-2 text-sm text-gray-500">
-            Last Updated: 16 October 2025
-          </p> */}
+          <p className="mt-2 text-sm text-gray-500">Last Updated: 15 May 2026</p>
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
-          {/* --- Sticky navigation (themed) --- */}
-          <aside className="lg-col-span-1 lg:sticky lg:top-24 h-fit">
+          <aside className="lg:col-span-1 lg:sticky lg:top-24 h-fit">
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-gray-800">Quick Navigation</h3>
               <ul className="mt-4 space-y-2">
                 {sections.map((section) => (
                   <li key={section.id}>
-                    <a
-                      href={`#${section.id}`}
-                      className="text-gray-600 transition-colors hover:text-primary hover:underline"
-                    >
+                    <a href={`#${section.id}`} className="text-gray-600 transition-colors hover:text-primary hover:underline">
                       {section.title}
                     </a>
                   </li>
@@ -86,64 +81,76 @@ export default function PrivacyPolicyPage() {
             </div>
           </aside>
 
-          {/* --- Main content area with updated policies for Vedant Gurukul --- */}
           <div className="lg:col-span-2">
             <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm md:p-12">
-              
               <PolicySection id="info-collected" icon={ClipboardList} title="1. Information We Collect">
-                <p>To provide you with our products and services, we collect information when you interact with our website. This may include:</p>
+                <p>We collect only the information needed to run our store, process orders, deliver products, and support customers.</p>
                 <ul>
-                  <li><strong>Personal Details:</strong> Your name, email, shipping address, and phone number when you create an account, place an order, or subscribe to our newsletter.</li>
-                  <li><strong>Order Information:</strong> Details about the products and services you purchase and your billing information.</li>
-                  <li><strong>Browsing Data:</strong> Information about how you navigate our site, which products you view, and items you add to your cart or wishlist. This helps us improve your experience.</li>
+                  <li><strong>Identity and contact details:</strong> name, email address, phone number, billing address, and shipping address.</li>
+                  <li><strong>Order details:</strong> products purchased, quantity, order value, invoice details, delivery status, returns, cancellations, and refunds.</li>
+                  <li><strong>Account details:</strong> login information, saved addresses, wishlist, and order history when you create an account.</li>
+                  <li><strong>Support details:</strong> messages sent through our contact form, WhatsApp, email, grievance form, or customer support channels.</li>
+                  <li><strong>Technical data:</strong> device, browser, IP address, cookies, and website usage data used for security and performance.</li>
                 </ul>
-                <p><strong>Note on Payments:</strong> Your payment details are processed securely by our trusted payment partner Razorpay. We do not store your credit card or full payment information on our servers.</p>
               </PolicySection>
 
               <PolicySection id="info-use" icon={Settings} title="2. How We Use Your Information">
-                <p>We use your information to operate our business and enhance your wellness journey with us. This includes:</p>
+                <p>We use customer information for legitimate business, legal, and customer support purposes, including:</p>
                 <ul>
-                    <li><strong>Fulfilling Your Orders:</strong> Processing payments, arranging for shipping, and sending you order confirmations and invoices.</li>
-                    <li><strong>Improving Our Offerings:</strong> Understanding your preferences to recommend products and content that may be beneficial for you.</li>
-                    <li><strong>Communication:</strong> Sending you updates about your order and, if you opt-in, sharing knowledge about new products, wellness articles, and exclusive offers.</li>
-                    <li><strong>Customer Support:</strong> Assisting you with your inquiries and ensuring your satisfaction.</li>
+                  <li>Creating and managing customer accounts.</li>
+                  <li>Processing orders, payments, invoices, shipping, returns, cancellations, and refunds.</li>
+                  <li>Sending order confirmations, delivery updates, support replies, and service notices.</li>
+                  <li>Improving product information, website performance, fraud prevention, and customer experience.</li>
+                  <li>Complying with tax, accounting, consumer protection, payment aggregator, and applicable legal requirements.</li>
                 </ul>
               </PolicySection>
 
-              <PolicySection id="info-sharing" icon={Share2} title="3. Sharing Your Information">
-                <p><strong>Your privacy is fundamental to our principles.</strong> We do not sell or rent your personal information. We only share data with essential partners who facilitate our services, such as:</p>
-                <ul>
-                    <li>Our trusted courier partners to deliver your orders.</li>
-                    <li>Our secure payment gateways to process your transactions.</li>
-                    <li>Technology partners who help us maintain and improve our website.</li>
-                </ul>
-                <p>These partners are bound by confidentiality agreements and are only authorized to use your information for the specific services they provide to us.</p>
-              </PolicySection>
-              
-              <PolicySection id="info-security" icon={Shield} title="4. Data Security">
-                <p>We implement a variety of industry-standard security measures, including SSL (Secure Socket Layer) encryption, to safeguard your personal information when you place an order or access your account.</p>
+              <PolicySection id="payments" icon={Shield} title="3. Payments & Razorpay">
+                <p>
+                  Online payments on our website are processed through Razorpay or other authorised payment partners. We do not store full card numbers, CVV, UPI PINs, net banking passwords, or other payment instrument credentials on our servers.
+                </p>
+                <p>
+                  To complete a transaction, Razorpay may receive required order and customer details such as name, email, phone number, amount, order ID, and payment status. Refunds for prepaid orders are initiated back to the original payment source wherever supported by the payment partner.
+                </p>
               </PolicySection>
 
-              <PolicySection id="cookies" icon={Cookie} title="5. Cookies & Tracking Technologies">
-                <p>We use cookies and similar technologies to help our site function effectively. These small data files allow us to remember what's in your cart, understand your browsing preferences, and gather data about site traffic so we can improve our digital offerings.</p>
-              </PolicySection>
-
-              <PolicySection id="your-rights" icon={UserCheck} title="6. Your Rights & Control">
-                <p>You have control over your personal information. You have the right to:</p>
+              <PolicySection id="info-sharing" icon={Share2} title="4. Information Sharing">
+                <p>We do not sell customer personal information. We share information only when required to provide our services or meet legal obligations.</p>
                 <ul>
-                    <li>Access the personal information we hold about you.</li>
-                    <li>Request that we correct any inaccurate information.</li>
-                    <li>Opt-out of marketing communications at any time by clicking the "unsubscribe" link in our emails.</li>
+                  <li><strong>Payment partners:</strong> to process payments, refunds, settlements, fraud checks, and chargeback queries.</li>
+                  <li><strong>Courier and logistics partners:</strong> to pack, ship, track, and deliver orders.</li>
+                  <li><strong>Technology partners:</strong> to host, maintain, secure, and improve the website.</li>
+                  <li><strong>Government, tax, legal, or regulatory authorities:</strong> where disclosure is required under applicable law.</li>
                 </ul>
               </PolicySection>
 
-              <PolicySection id="policy-changes" icon={FileClock} title="7. Policy Updates">
-                <p>We may update this privacy policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will post any changes on this page and update the "Last Updated" date.</p>
+              <PolicySection id="info-security" icon={FileClock} title="5. Security & Retention">
+                <p>
+                  We use reasonable technical and organisational safeguards to protect customer information, including access controls and secure payment processing. No internet transmission is completely risk free, but we work to protect data in line with the nature of our business.
+                </p>
+                <p>
+                  We retain customer information only as long as necessary for order fulfilment, customer support, fraud prevention, tax/accounting records, legal compliance, and dispute resolution.
+                </p>
               </PolicySection>
-              
+
+              <PolicySection id="cookies" icon={Cookie} title="6. Cookies & Similar Technologies">
+                <p>
+                  We use cookies and similar technologies to keep the website functional, remember cart/session details, understand website performance, and improve browsing experience. You may disable cookies in your browser, but some features may not work correctly.
+                </p>
+              </PolicySection>
+
+              <PolicySection id="your-rights" icon={UserCheck} title="7. Your Rights & Choices">
+                <p>
+                  You may request access, correction, update, deletion, or withdrawal of consent for your personal information, subject to applicable law and legitimate business/legal retention needs. You can also opt out of marketing communication where applicable.
+                </p>
+              </PolicySection>
+
               <PolicySection id="contact-us" icon={Mail} title="8. Contact Us">
-                <p>If you have any questions or concerns regarding your privacy, please do not hesitate to contact us. We are here to provide clarity and assistance.</p>
-                <p><strong>Email:</strong> <a href="mailto:support@vedantgurukul.com" className="text-primary underline">support@vedantgurukul.com</a></p>
+                <p>For privacy requests, order support, payment queries, or grievances, contact us at:</p>
+                <p><strong>Email:</strong> <a href={`mailto:${supportEmail}`} className="text-primary underline">{supportEmail}</a></p>
+                <p><strong>Phone:</strong> {supportPhone}</p>
+                <p><strong>Address:</strong> {businessAddress}</p>
+                <p>We aim to acknowledge and resolve customer queries within 4 business days wherever possible.</p>
               </PolicySection>
             </div>
           </div>

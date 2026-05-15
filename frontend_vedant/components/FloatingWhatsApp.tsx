@@ -6,9 +6,9 @@ import { FaWhatsapp } from "react-icons/fa"
 
 const FloatingWhatsApp = () => {
   const phoneNumber = "917991749998" // Replace with your WhatsApp number
-  const message = "Hello! I'd like to inquire about your jewelry." // Optional pre-filled message
+  const message = "Hello! I'd like to inquire about Vedant Gurukul Aroma oils." // Optional pre-filled message
 
-  const whatsappUrl = `https://wa.me/${phoneNumber}`
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
   return (
     <a

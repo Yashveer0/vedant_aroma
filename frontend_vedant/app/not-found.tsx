@@ -38,7 +38,7 @@ export default function NotFound() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-gray-600 mb-8"
         >
-          The jewelry piece you're looking for seems to have been misplaced. Let's help you find something beautiful
+          The page you're looking for is not available. Let's help you find our aroma oil collection
           instead.
         </motion.p>
 
@@ -54,7 +54,7 @@ export default function NotFound() {
               <span>Go Home</span>
             </Button>
           </Link>
-          <Link href="/collections/women">
+          <Link href="/shop">
             <Button
               variant="outline"
               className="flex items-center space-x-2 border-orange-500 text-orange-500 hover:bg-orange-50 px-6 py-3 rounded-xl bg-transparent"

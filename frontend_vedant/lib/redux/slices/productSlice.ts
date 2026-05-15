@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/api/auth';
 import { API_BASE_URL } from '@/lib/api/config';
 import { resolveMediaUrl, resolveMediaUrls } from '@/lib/media';
+import { filterVisibleProducts, isProductVisibleForRazorpay } from '@/lib/catalogCompliance';
 
 // --- Type Definitions ---
 
@@ -73,9 +74,14 @@ export const fetchProducts = createAsyncThunk(
       });
       const response = await axios.get(`${API_BASE_URL}/products?${params.toString()}`);
       const data = response.data.data;
+      const normalizedProducts = (data.products || []).map(normalizeProductMedia);
+      const visibleProducts = filterVisibleProducts(normalizedProducts);
+      const removedRestrictedProducts = visibleProducts.length !== normalizedProducts.length;
       return {
         ...data,
-        products: (data.products || []).map(normalizeProductMedia),
+        products: visibleProducts,
+        totalProducts: removedRestrictedProducts ? visibleProducts.length : data.totalProducts,
+        totalPages: removedRestrictedProducts ? 1 : data.totalPages,
       };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
@@ -92,7 +98,7 @@ export const fetchSearchResults = createAsyncThunk(
         if (value) params.append(key, String(value));
       });
       const response = await axios.get(`${API_BASE_URL}/products?${params.toString()}`);
-      return (response.data.data.products || []).map(normalizeProductMedia);
+      return filterVisibleProducts((response.data.data.products || []).map(normalizeProductMedia));
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Search failed');
     }
@@ -104,7 +110,11 @@ export const fetchProductBySlug = createAsyncThunk(
   async (slug: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/products/slug/${slug}`);
-      return normalizeProductMedia(response.data.data);
+      const product = normalizeProductMedia(response.data.data);
+      if (!isProductVisibleForRazorpay(product)) {
+        return rejectWithValue("Product is not available");
+      }
+      return product;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch product");
     }
@@ -116,7 +126,11 @@ export const fetchProductById = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/products/${id}`);
-      return normalizeProductMedia(response.data.data);
+      const product = normalizeProductMedia(response.data.data);
+      if (!isProductVisibleForRazorpay(product)) {
+        return rejectWithValue("Product is not available");
+      }
+      return product;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch product");
     }

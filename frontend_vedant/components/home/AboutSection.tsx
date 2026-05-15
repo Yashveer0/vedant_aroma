@@ -36,13 +36,13 @@ export function AboutSection() {
                         {/* Description */}
                         <div className="space-y-4 text-[var(--text-secondary)] leading-relaxed">
                             <p className="text-base md:text-lg">
-                                <span className="font-semibold text-[var(--card-text)]">Vedant Gurukul</span> is a leading brand offering expert services in Vastu Shastra, Astrology, Numerology, Aura Scanning, and Aromatherapy.
+                                <span className="font-semibold text-[var(--card-text)]">Vedant Gurukul Aroma Mart</span> offers aroma oils and ritual blends inspired by Vastu Shastra, Astrology, Yoga, and Aromatherapy traditions.
                             </p>
                             <p className="text-base">
-                                Our distinguished faculty includes highly qualified professionals like <span className="font-semibold text-[var(--card-text)]">Aacharya Dr. Manish</span> and <span className="font-semibold text-[var(--card-text)]">Ms. Anisha Saxena</span>, an expert consultant with over two decades of experience.
+                                Our blends are curated under the guidance of experienced practitioners including <span className="font-semibold text-[var(--card-text)]">Aacharya Dr. Manish</span> and <span className="font-semibold text-[var(--card-text)]">Ms. Anisha Saxena</span>.
                             </p>
                             <p className="text-base">
-                                We provide comprehensive guidance, education, and practical remedies, bridging ancient wisdom with modern challenges to harmonize your life and space.
+                                We focus on pure fragrance, careful packaging, clear product information, and dependable customer support for every order.
                             </p>
                         </div>
 
@@ -53,14 +53,14 @@ export function AboutSection() {
                                     <Award className="h-7 w-7 text-white" />
                                 </div>
                                 <p className="text-2xl font-bold text-[var(--text-primary)]">20+</p>
-                                <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">Years Experience</p>
+                                    <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">Brand Experience</p>
                             </div>
                             <div className="text-center">
                                 <div className="inline-flex items-center justify-center h-14 w-14 bg-gradient-to-br from-[var(--text-primary)] to-[var(--base-200)] rounded-2xl mb-3 shadow-lg">
                                     <Users className="h-7 w-7 text-white" />
                                 </div>
                                 <p className="text-2xl font-bold text-[var(--text-primary)]">Expert</p>
-                                <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">Faculty</p>
+                                    <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">Curation</p>
                             </div>
                             <div className="text-center">
                                 <div className="inline-flex items-center justify-center h-14 w-14 bg-gradient-to-br from-[var(--text-primary)] to-[var(--base-200)] rounded-2xl mb-3 shadow-lg">
@@ -116,7 +116,7 @@ export function AboutSection() {
                                 </div>
                                 <div>
                                     <p className="text-xs text-[var(--text-secondary)] mb-1">Top Rated</p>
-                                    <p className="text-sm font-bold text-[var(--card-text)] leading-tight">Expert Vastu & Astrology</p>
+                                    <p className="text-sm font-bold text-[var(--card-text)] leading-tight">Curated Aroma Oils</p>
                                 </div>
                             </div>
                         </div>
@@ -138,19 +138,19 @@ export function AboutSection() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         <div>
                             <p className="text-sm text-[var(--text-secondary)] mb-1">Expertise In</p>
-                            <p className="font-bold text-[var(--card-text)]">Vastu Shastra</p>
+                            <p className="font-bold text-[var(--card-text)]">Vastu Oils</p>
                         </div>
                         <div>
                             <p className="text-sm text-[var(--text-secondary)] mb-1">Expertise In</p>
-                            <p className="font-bold text-[var(--card-text)]">Astrology</p>
+                            <p className="font-bold text-[var(--card-text)]">Astrology Oils</p>
                         </div>
                         <div>
                             <p className="text-sm text-[var(--text-secondary)] mb-1">Expertise In</p>
-                            <p className="font-bold text-[var(--card-text)]">Numerology</p>
+                            <p className="font-bold text-[var(--card-text)]">Meditation Oils</p>
                         </div>
                         <div>
                             <p className="text-sm text-[var(--text-secondary)] mb-1">Expertise In</p>
-                            <p className="font-bold text-[var(--card-text)]">Aromatherapy</p>
+                            <p className="font-bold text-[var(--card-text)]">Aroma Blends</p>
                         </div>
                     </div>
                 </div>

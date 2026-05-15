@@ -180,7 +180,7 @@ export function ContactForm() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 p-8 text-white">
                         <div className="flex items-center gap-3 mb-4"><Mail size={20} /><span>vedant.gurukul7@gmail.com</span></div>
-                        <div className="flex items-center gap-3 mb-4"><Phone size={20} /><span>+917991749998 +918299854442</span></div>
+                        <div className="flex items-center gap-3 mb-4"><Phone size={20} /><span>+91 79917 49998, +91 82998 54442</span></div>
                         <div className="flex items-center gap-3"><MapPin size={20} /><span>K-911, Sector-K, Ashiyana, Kanpur Road, Lucknow. Pin. 226012</span></div>
                     </div>
                 </div>

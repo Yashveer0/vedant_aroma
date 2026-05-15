@@ -173,58 +173,16 @@ export const products: Product[] = [
       numReviews: 0,
       minQuantity: 1,
   },
-
-  // --- Category: Aroma Medicines & Aark Ayurveda ---
-  {
-      name: "Stress Relief Inhalant",
-      slug: "stress-relief-inhalant",
-      description: "A potent aromatic medicine for instant relief from stress and anxiety. Simply inhale from the bottle to calm your nervous system. Contains a blend of Lavender, Bergamot, and Ylang-Ylang.",
-      price: 250,
-      images: [
-          '/images/products/stress-inhalant-1.jpg'
-      ],
-      category: "Aroma Medicines",
-      brand: "Vedant Aroma",
-      gender: "Unisex",
-      tags: ["aroma", "medicine", "stress relief", "anxiety"],
-      stock_quantity: 120,
-      isActive: true,
-      volume: 5,
-      reviews: [],
-      averageRating: 0,
-      numReviews: 0,
-      minQuantity: 1,
-  },
-  {
-      name: "Triphala Herbal Ark",
-      slug: "triphala-herbal-ark",
-      description: "A potent liquid extract (Ark) of Triphala, the classic Ayurvedic formula for digestion and detoxification. Aark Ayurveda brings you this pure, steam-distilled concentrate for holistic wellness.",
-      price: 499,
-      images: [
-          '/images/products/triphala-ark-1.jpg'
-      ],
-      category: "Aark Ayurveda",
-      brand: "Aark Ayurveda",
-      gender: "Unisex",
-      tags: ["ayurveda", "ark", "triphala", "digestion", "detox"],
-      stock_quantity: 90,
-      isActive: true,
-      volume: 50,
-      reviews: [],
-      averageRating: 0,
-      numReviews: 0,
-      minQuantity: 1,
-  }
 ];
 
-// --- MOCK CART ITEMS (Women's Products Only) ---
+// --- MOCK CART ITEMS ---
 export const mockCartItems = [
   
 ];
 
 // export const mockSubTotal = mockCartItems.reduce((acc, item) => acc + item.price, 0);
 
-// --- MOCK WISHLIST ITEMS (Women's Products Only) ---
+// --- MOCK WISHLIST ITEMS ---
 export interface WishlistItem {
   
 }

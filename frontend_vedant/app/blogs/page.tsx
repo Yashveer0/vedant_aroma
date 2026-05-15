@@ -149,7 +149,7 @@ export default function BlogPage() {
       {/* Holistic Wellness Category Section */}
       {/* <BlogSection
         title="Holistic Wellness & Healing"
-        subtitle="Insights into Yoga, Healing, Ayurveda, and traditional practices for a balanced life"
+        subtitle="Insights into Yoga, meditation, aroma traditions, and balanced living"
         filterParams={{ limit: 6, category: "Wellness" }}
         className="my-16 md:my-24"
       /> */}

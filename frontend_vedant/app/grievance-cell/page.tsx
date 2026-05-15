@@ -106,7 +106,7 @@ export default function GrievancePage() {
     {
       step: 'Step 4: Harmony',
       title: 'Fair & Timely Resolution',
-      description: 'We will communicate our findings and the proposed resolution to you within 15 business days, always seeking balance.',
+      description: 'We will communicate our findings and the proposed resolution within 4 business days wherever possible.',
       icon: <CheckCircle className="w-10 h-10 text-green-600" />,
     },
   ];
@@ -118,7 +118,7 @@ export default function GrievancePage() {
       <section className="relative h-[60vh] flex items-center justify-center text-white bg-[var(--brand-orange)]/40">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/ayurveda-wellness-hero.jpg" // A relaxing image related to Ayurveda, yoga, or nature
+            src="/images/blog-bg.jpg"
             alt="Symbol of balance and holistic wellness"
             fill
             priority
@@ -153,7 +153,7 @@ export default function GrievancePage() {
             <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Our Commitment to You</h2>
                 <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                    At Vedant Gurukul Aroma, your peace and satisfaction are paramount. We have established a mindful support channel to ensure your concerns are heard and addressed in a timely, fair, and effective manner. We are committed to upholding the highest standards of service, rooted in the wisdom of Ayurveda.
+                    At Vedant Gurukul Aroma, your satisfaction is paramount. We have established a clear support channel to ensure your order, payment, delivery, and product concerns are heard and addressed in a timely, fair, and effective manner.
                 </p>
             </div>
         </div>
@@ -216,7 +216,7 @@ export default function GrievancePage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-800">Response Time:</h4>
-                      <p className="text-gray-600">We will address your email within 72 business hours.</p>
+                      <p className="text-gray-600">We will address your email within 4 business days wherever possible.</p>
                     </div>
                   </div>
                 </div>
@@ -254,7 +254,6 @@ export default function GrievancePage() {
                       <option value="Order Inquiry">Order Inquiry</option>
                       <option value="Product/Oil Inquiry">Product/Oil Inquiry</option>
                       <option value="Shipping Inquiry">Shipping Inquiry</option>
-                      <option value="Yoga Service Inquiry">Yoga Service Inquiry</option>
                       <option value="Payment Inquiry">Payment Inquiry</option>
                       <option value="Feedback/Suggestion">Feedback/Suggestion</option>
                       <option value="Other">Other</option>

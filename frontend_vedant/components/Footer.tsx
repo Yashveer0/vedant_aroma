@@ -6,9 +6,9 @@ import { Facebook, Instagram, Twitter, Youtube, ArrowRight } from 'lucide-react'
 // --- UPDATED Data for footer links based on your file structure ---
 const infoLinks = [
   { name: 'My Account', href: '/account/user' },
-  { name: 'Order History', href: '/account/user/orders' }, // Assuming this route exists under account
-  // { name: 'Bulk Orders', href: '/bulk-order' },
-  // { name: 'Contact Us', href: '/#contactus' }, // Assuming a contact page
+  { name: 'Order History', href: '/account/user/order-history' },
+  { name: 'Contact Us', href: '/#contact' },
+  { name: 'Grievance Cell', href: '/grievance-cell' },
 ];
 
 const quickShopLinks = [
@@ -21,6 +21,7 @@ const quickShopLinks = [
 
 const customerServiceLinks = [
   { name: 'Shipping Policy', href: '/shipping-policy' },
+  { name: 'Cancellation Policy', href: '/cancellation-policy' },
   { name: 'Return Policy', href: '/return-policy' },
   { name: 'Refund Policy', href: '/refund-policy' },
   { name: 'Privacy Policy', href: '/privacy-policy' },
@@ -45,7 +46,7 @@ const Footer = () => {
             <h2 className="text-3xl font-serif font-bold mb-4">vedant gurukul aroma</h2>
             <div className="space-y-3 text-sm text-gray-600">
               <p><span className="font-semibold text-gray-800">Mail:</span> vedant.gurukul7@gmail.com</p>
-              <p><span className="font-semibold text-gray-800">Phone:</span>+917991749998 +918299854442</p>
+              <p><span className="font-semibold text-gray-800">Phone:</span> +91 79917 49998, +91 82998 54442</p>
               <p><span className="font-semibold text-gray-800">Address:</span> K-911, Sector-K, Ashiyana, Kanpur Road, Lucknow. Pin. 226012</p>
             </div>
           </div>

@@ -19,19 +19,9 @@ const trendingCategories = [
         href: "/shop?category=Astrology%20Oils"
     },
     { 
-        name: "Yoga & Healing Oils", 
+        name: "Yoga & Meditation Oils", 
         image: "/images/category5.webp",
         href: "/shop?category=Yoga%20%26%20Healing%20Oils"
-    },
-    { 
-        name: "Aroma Medicines", 
-        image: "/images/category1.webp",
-        href: "/shop?category=Aroma%20Medicines"
-    },
-    { 
-        name: "Aark Ayurveda", 
-        image: "/images/category2.webp",
-        href: "/shop?category=Aark%20Ayurveda"
     },
     { 
         name: "View All", 
@@ -72,7 +62,7 @@ export function CategoryScroller() {
                         Explore Our Offerings
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        From specialized Aroma Blends to expert consultations in Vastu and Astrology, discover our holistic approach to wellness.
+                        Discover aroma oils crafted for Vastu, astrology, meditation, and daily rituals.
                     </p>
                 </div>
                 

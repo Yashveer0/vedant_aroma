@@ -331,7 +331,7 @@ const ProductDetailsPage = () => {
               {!stockMessage && isBulkOrder && <p className="text-gray-600">This item is for bulk orders only.</p>}
             </div>
             <Separator className="my-6"/><div className="space-y-4"><div><h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3><div className="prose text-gray-600 max-w-none" dangerouslySetInnerHTML={{ __html: product.description }} /></div></div><Separator className="my-6"/>
-            <Accordion type="single" collapsible className="w-full"><AccordionItem value="shipping"><AccordionTrigger>Shipping & Returns</AccordionTrigger><AccordionContent className="text-gray-600 prose-sm max-w-none"><p>Free standard shipping on all orders over ₹1,999.</p><p>We accept returns within 14 days of delivery. Please visit our <Link href="/return-policy" className="text-primary underline">Return Policy</Link> page for more details.</p></AccordionContent></AccordionItem></Accordion>
+            <Accordion type="single" collapsible className="w-full"><AccordionItem value="shipping"><AccordionTrigger>Shipping & Returns</AccordionTrigger><AccordionContent className="text-gray-600 prose-sm max-w-none"><p>Free standard shipping on prepaid orders over Rs. 999.</p><p>Eligible unopened products can be returned within 7 days of delivery. Please visit our <Link href="/return-policy" className="text-primary underline">Return Policy</Link> page for more details.</p></AccordionContent></AccordionItem></Accordion>
           </motion.div>
         </div>
         <ProductReviews product={product} />

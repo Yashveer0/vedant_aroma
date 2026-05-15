@@ -12,7 +12,7 @@ const testimonials = [
         location: "Mumbai, Maharashtra",
         image: "/testimonials/user-1.jpg",
         rating: 5,
-        text: "The healing oils from Vedant Gurukul have transformed my daily yoga practice. The quality and authenticity are unmatched. I feel more balanced and centered every day."
+        text: "The aroma oils from Vedant Gurukul have become a beautiful part of my daily yoga practice. The quality and authenticity are unmatched."
     },
     {
         id: 2,
@@ -28,7 +28,7 @@ const testimonials = [
         location: "Bangalore, Karnataka",
         image: "/testimonials/user-3.jpg",
         rating: 5,
-        text: "Pure, authentic Ayurvedic products! The aroma and quality speak for themselves. My entire family uses these oils for meditation and healing practices."
+        text: "Pure, authentic aroma oils. The fragrance and quality speak for themselves. My family uses these oils during meditation and daily rituals."
     },
     {
         id: 4,
@@ -44,7 +44,7 @@ const testimonials = [
         location: "Chennai, Tamil Nadu",
         image: "/testimonials/user-5.jpg",
         rating: 5,
-        text: "The traditional formulations combined with modern quality standards make these products exceptional. Highly recommend for anyone seeking authentic Ayurvedic solutions."
+        text: "The traditional inspiration combined with modern quality standards makes these products exceptional. Highly recommend for anyone seeking authentic aroma blends."
     },
     {
         id: 6,
@@ -52,7 +52,7 @@ const testimonials = [
         location: "Jaipur, Rajasthan",
         image: "/testimonials/user-6.jpg",
         rating: 5,
-        text: "Outstanding quality and service! These healing oils have become an essential part of my wellness routine. Thank you Vedant Gurukul!"
+        text: "Outstanding quality and service. These aroma oils have become an essential part of my daily routine. Thank you Vedant Gurukul!"
     }
 ];
 
@@ -132,7 +132,7 @@ export function TestimonialsSection() {
                         What Our Customers Say
                     </h2>
                     <p className="text-base md:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
-                        Discover the transformative experiences of those who have embraced our authentic Ayurvedic products
+                        Discover the experiences of customers who use our authentic aroma oils and ritual blends
                     </p>
                 </div>
 

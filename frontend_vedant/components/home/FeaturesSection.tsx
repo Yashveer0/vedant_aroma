@@ -3,10 +3,10 @@
 import { Phone, Package, BadgeCheck, Truck } from "lucide-react";
 
 const featureItems = [
-  { icon: <Phone size={40} className="mx-auto text-gray-700" />, title: "24/7 Customer Service", description: "We're here to help you with any questions or concerns you have, 24/7." },
-  { icon: <Package size={40} className="mx-auto text-gray-700" />, title: "14-Day Money Back", description: "If you're not satisfied with your purchase, simply return it within 14 days for a refund." },
-  { icon: <BadgeCheck size={40} className="mx-auto text-gray-700" />, title: "Our Guarantee", description: "We stand behind our products and services and guarantee your satisfaction." },
-  { icon: <Truck size={40} className="mx-auto text-gray-700" />, title: "Shipping Worldwide", description: "We ship our products worldwide, making them accessible to customers everywhere." },
+  { icon: <Phone size={40} className="mx-auto text-gray-700" />, title: "Customer Support", description: "Reach us by phone, email, WhatsApp, or the contact form for order and product queries." },
+  { icon: <Package size={40} className="mx-auto text-gray-700" />, title: "7-Day Returns", description: "Eligible unopened products can be returned within 7 days of delivery." },
+  { icon: <BadgeCheck size={40} className="mx-auto text-gray-700" />, title: "Quality Checked", description: "Every aroma oil is packed carefully with a focus on purity, labeling, and safe delivery." },
+  { icon: <Truck size={40} className="mx-auto text-gray-700" />, title: "India Shipping", description: "Orders are shipped across India through trusted courier partners." },
 ];
 
 export function FeaturesSection() {
